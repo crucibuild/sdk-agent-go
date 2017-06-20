@@ -1,0 +1,8 @@
+{
+  "name": "agent-ping",
+  "title": "Agent Pong",
+  "description" : "Agent responsible for sending ping commands to the pong agent",
+  "version": "1.4.0",
+  "type": "service:ping",
+  "keyword": ["go", "agent", "pong", "example"]
+}

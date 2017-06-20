@@ -1,0 +1,9 @@
+{
+  "type": "record",
+  "name": "crucibuild/agent-example-go#test-command",
+  "fields": [
+    { "name": "foo", "type": "crucibuild/agent-example-go#header" },
+    { "name": "value", "type": "string" },
+    { "name": "x", "type": "int" }
+  ]
+}
