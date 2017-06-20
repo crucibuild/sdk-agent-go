@@ -1,0 +1,10 @@
+os:
+  - linux
+
+language: go
+
+go:
+    - 1.8.x
+    - master
+
+install: true
