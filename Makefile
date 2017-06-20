@@ -3,17 +3,16 @@ NAME=sdk-agent-go
 FULL_NAME=${PREFIX}/${NAME}
 FULL_GOPATH=${GOPATH}/src/${FULL_NAME}
 
-default: build
+default: test
 
-build:
+get:
 	go get "github.com/omeid/go-resources/cmd/resources"
+	go get -t -v ./...
+
+build: get
 	cd example/agent-ping && resources -output="resources.go" -var="Resources" -trim="../" resources/* ../schema/*
 	cd example/agent-pong && resources -output="resources.go" -var="Resources" -trim="../" resources/* ../schema/*
-	go build "${FULL_NAME}/example/agent-ping"
-	go build "${FULL_NAME}/example/agent-pong"
+	go build -v ./...
 
-install: build
-	go install "${FULL_NAME}/example/agent-ping" "${FULL_NAME}/example/agent-pong" "${FULL_NAME}"
-
-clean: env
-	go clean "${FULL_NAME}"
+test: build
+	go test -v ./...
