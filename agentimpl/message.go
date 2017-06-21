@@ -214,7 +214,6 @@ func (a *AMQP) Connect() (err error) {
 				return nil
 			}
 		}
-		return nil
 	})
 
 	// main loop
@@ -238,7 +237,6 @@ func (a *AMQP) Connect() (err error) {
 				return nil
 			}
 		}
-		return nil
 	})
 
 	return
@@ -609,7 +607,6 @@ func (a *AMQP) RegisterEventCallback(filter agentiface.EventFilter, eventCallbac
 				return nil
 			}
 		}
-		return nil
 	})
 
 	return queue.Name, nil
