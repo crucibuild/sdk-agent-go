@@ -13,6 +13,9 @@
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
 
+# JetBrains IDEs (IntelliJ, Gogland)
+.idea
+
 agent-ping
 agent-pong
 resources.go
