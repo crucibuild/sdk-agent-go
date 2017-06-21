@@ -579,6 +579,10 @@ func (a *AMQP) RegisterEventCallback(filter agentiface.EventFilter, eventCallbac
 		amqp.Table(filter),
 	)
 
+	if err != nil {
+		return "", err
+	}
+
 	// listen to it:
 	channel, err := a.channel.Consume(
 		queue.Name, // queue

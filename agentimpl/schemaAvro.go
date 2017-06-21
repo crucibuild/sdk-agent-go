@@ -102,7 +102,7 @@ func LoadAvroSchema(rawSchema string, registry agentiface.SchemaRegistry) (agent
 
 	title := ""
 	if t, ok := avroSchema.Prop("title"); ok {
-		title, ok = t.(string)
+		title, _ = t.(string)
 	}
 
 	return &AvroSchema{

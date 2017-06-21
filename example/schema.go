@@ -38,7 +38,7 @@ type TestedEvent struct {
 var TestedEventType reflect.Type = nil
 
 func init() {
-	var err error = nil
+	var err error
 
 	TestCommandType, err = util.GetStructType(&TestCommand{})
 	if err != nil {

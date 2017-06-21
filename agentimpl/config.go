@@ -107,6 +107,10 @@ func (config *Config) createDefaultConfig(overwrite bool) error {
 
 	err := os.MkdirAll(filepath.Dir(cfgFile), os.ModePerm)
 
+	if err != nil {
+		return err
+	}
+
 	f, err := os.Create(cfgFile)
 
 	if err != nil {
@@ -116,6 +120,10 @@ func (config *Config) createDefaultConfig(overwrite bool) error {
 	defer f.Close()
 
 	_, err = p.Write(f, properties.UTF8)
+
+	if err != nil {
+		return err
+	}
 
 	config.agent.Info("Configuration initialized: %s", cfgFile)
 

@@ -64,8 +64,7 @@ func cmdManifestShow(a agentiface.Agent) *cobra.Command {
 		Short: "Show the manifest of the agent",
 		Long:  `Show the manifest of the agent.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			prettyFormat := false
-			prettyFormat, _ = cmd.Flags().GetBool("pretty-print")
+			prettyFormat, _ := cmd.Flags().GetBool("pretty-print")
 
 			var raw []byte
 			var err error
