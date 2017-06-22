@@ -97,7 +97,7 @@ func (s *TypeRegistry) TypeListNames() []string {
 	values := make([]string, len(s.typesByName))
 
 	i := 0
-	for k, _ := range s.typesByName {
+	for k := range s.typesByName {
 		values[i] = k
 		i++
 	}

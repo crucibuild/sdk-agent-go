@@ -144,7 +144,7 @@ func (s *SchemaRegistry) SchemaListIds() []string {
 	values := make([]string, len(s.schemas))
 
 	i := 0
-	for k, _ := range s.schemas {
+	for k := range s.schemas {
 		values[i] = k
 		i++
 	}
