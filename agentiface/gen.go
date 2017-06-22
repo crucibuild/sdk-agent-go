@@ -1,6 +1,3 @@
-//go:generate genny -in=util/registry.go -out=schema.go -pkg agent gen "KEY=string VALUE=string NAME=Schema"
-//go:generate genny -in=util/registry.go -out=type.go -pkg agent gen "KEY=string VALUE=interface{} NAME=Type"
-
 /* Copyright (C) 2016 Christophe Camel, Jonathan Pigrée
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
