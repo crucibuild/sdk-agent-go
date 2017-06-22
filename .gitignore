@@ -19,3 +19,6 @@
 agent-ping
 agent-pong
 resources.go
+
+# Go generated coverage reports
+*.coverprofile
