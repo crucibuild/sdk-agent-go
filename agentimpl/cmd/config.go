@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/crucibuild/sdk-agent-go/agentiface"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -29,6 +30,8 @@ func RegisterCmdConfig(a agentiface.Agent) {
 
 	// Register commands
 	a.RegisterCommand(cmdConfigInit(a))
+	a.RegisterCommand(cmdConfigList(a))
+	a.RegisterCommand(cmdConfigGet(a))
 
 }
 
@@ -64,6 +67,28 @@ func cmdConfigList(a agentiface.Agent) *cobra.Command {
 		Long:  `List all configuration`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return a.PrintConfig(os.Stdout)
+		},
+	}
+
+	return command
+}
+
+func cmdConfigGet(a agentiface.Agent) *cobra.Command {
+	command := &cobra.Command{
+		Use:   "config:get",
+		Short: "Get a value",
+		Long:  `Get a value`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			switch len(args) {
+			case 0:
+				return errors.New("No configuration key provided")
+			case 1:
+				key := args[0]
+				println(a.GetConfigString(key))
+				return nil
+			default:
+				return errors.New("More than one configuration key provided")
+			}
 		},
 	}
 

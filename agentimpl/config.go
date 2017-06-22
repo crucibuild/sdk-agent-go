@@ -69,10 +69,6 @@ func (config *Config) LoadConfigFrom(path string) error {
 	return config.LoadConfig()
 }
 
-func (config *Config) Save() {
-
-}
-
 // Init initialize a new configuration file with default values
 // returns an error if configuration file already exists
 func (config *Config) CreateDefaultConfig() error {
