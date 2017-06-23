@@ -20,18 +20,49 @@ import (
 	"testing"
 )
 
+type aStruct struct {
+	Value string
+}
+
+func TestGetStructType(t *testing.T) {
+	// Arrange
+	var data = []struct {
+		instance     interface{}  // instance to test
+		expectedType reflect.Type // expected type
+		expectError  bool
+	}{
+		{aStruct{}, reflect.TypeOf(aStruct{}), false},
+		{&aStruct{}, reflect.TypeOf(aStruct{}), false},
+		{"foo", nil, true},
+	}
+
+	for i, tt := range data {
+		// Act
+		result, err := GetStructType(tt.instance)
+
+		// Assert
+		if tt.expectError == (err == nil) {
+			t.Errorf("test %d: Expected error and returned error differs", i)
+		}
+
+		if result != tt.expectedType {
+			t.Errorf("test %d: Bad type returned", i)
+		}
+	}
+}
+
 func TestNew(t *testing.T) {
 	// Arrange
-	type AStruct struct {
-		Value string
+	type ComplexStruct struct {
+		V1 string
+		V2 map[int]string
+		V3 []int
+		V4 chan int
+		V5 aStruct
+		V6 *aStruct
 	}
 
-	x := AStruct{}
-	tpe, err := GetStructType(x)
-
-	if err != nil {
-		t.Error(err.Error())
-	}
+	tpe := reflect.TypeOf(ComplexStruct{})
 
 	// Act
 	v := New(tpe)
@@ -42,28 +73,22 @@ func TestNew(t *testing.T) {
 	}
 
 	// test type conversion
-	aStruct := v.(*AStruct)
-	aStruct.Value = "test"
+	aStruct := v.(*ComplexStruct)
 
-	// test field
-	ntpe, err := GetStructType(v)
-	if err != nil {
-		t.Error(err.Error())
+	// fields must be initialized
+	if aStruct.V2 == nil {
+		t.Error("V2 not initialized")
 	}
 
-	if ntpe.NumField() != 1 {
-		t.Error("Incorrect number of fields")
+	if aStruct.V3 == nil {
+		t.Error("V3 not initialized")
 	}
 
-	f := ntpe.Field(0)
-	if f.Name != "Value" {
-		t.Error("Incorrect field name")
+	if aStruct.V4 == nil {
+		t.Error("V4 not initialized")
 	}
 
-	rv := reflect.ValueOf(v)
-
-	if rv.Kind() != reflect.Ptr || rv.IsNil() {
-		t.Error("Not applicable for non-pointer types or nil")
+	if aStruct.V6 == nil {
+		t.Error("V6 not initialized")
 	}
-
 }
