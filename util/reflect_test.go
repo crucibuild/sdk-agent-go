@@ -16,6 +16,7 @@
 package util
 
 import (
+	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 )
@@ -41,13 +42,11 @@ func TestGetStructType(t *testing.T) {
 		result, err := GetStructType(tt.instance)
 
 		// Assert
-		if tt.expectError == (err == nil) {
-			t.Errorf("test %d: Expected error and returned error differs", i)
-		}
+		assert.Equal(t, tt.expectError, err != nil,
+			"test %d: Expected error and returned error must match", i)
 
-		if result != tt.expectedType {
-			t.Errorf("test %d: Bad type returned", i)
-		}
+		assert.Equal(t, tt.expectedType, result,
+			"test %d: Type must match", i)
 	}
 }
 
@@ -68,27 +67,17 @@ func TestNew(t *testing.T) {
 	v := New(tpe)
 
 	// Assert
-	if v == nil {
-		t.Error("Value is nil")
-	}
+	assert.NotNil(t, v, "Value must not be nil")
 
 	// test type conversion
 	aStruct := v.(*ComplexStruct)
 
 	// fields must be initialized
-	if aStruct.V2 == nil {
-		t.Error("V2 not initialized")
-	}
+	assert.NotNil(t, aStruct.V2, "V2 must be initialized")
 
-	if aStruct.V3 == nil {
-		t.Error("V3 not initialized")
-	}
+	assert.NotNil(t, aStruct.V3, "V3 must be initialized")
 
-	if aStruct.V4 == nil {
-		t.Error("V4 not initialized")
-	}
+	assert.NotNil(t, aStruct.V4, "V4 must be initialized")
 
-	if aStruct.V6 == nil {
-		t.Error("V6 not initialized")
-	}
+	assert.NotNil(t, aStruct.V6, "V6 must be initialized")
 }

@@ -1,6 +1,7 @@
 package util
 
 import (
+	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 )
@@ -28,9 +29,8 @@ func TestAbsPathify(t *testing.T) {
 		result := AbsPathify(tt.path)
 
 		// Assert
-		if result != tt.expectedResult {
-			t.Errorf("test %d: Bad absolute path returned. Expected '%s', got '%s'", i, tt.expectedResult, result)
-		}
+		assert.Equal(t, tt.expectedResult, result,
+			"test %d: Absolute path must match (for path '%s')", i, tt.path)
 	}
 }
 
@@ -51,8 +51,8 @@ func TestExists(t *testing.T) {
 		result := Exists(tt.path)
 
 		// Assert
-		if result != tt.expectedResult {
-			t.Errorf("test %d: Expected '%t', got '%t' for path '%s'", i, tt.expectedResult, result, tt.path)
-		}
+		assert.Equal(t, tt.expectedResult, result,
+			"test %d: Path existence must match (for path '%s')", i, tt.path)
+
 	}
 }
