@@ -1,8 +1,3 @@
-PREFIX=github.com/crucibuild
-NAME=sdk-agent-go
-FULL_NAME=${PREFIX}/${NAME}
-FULL_GOPATH=${GOPATH}/src/${FULL_NAME}
-
 default: test
 
 dependencies:
