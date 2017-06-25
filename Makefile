@@ -1,13 +1,9 @@
 default: check
 
+.PHONY: check ci dependencies
+
 dependencies:
 	go get -t -v ./...
-
-build: dependencies
-	go build -v ./...
-
-test: build
-	go test -v ./...
 
 check: dependencies
 	! gofmt -d . 2>&1 | read
