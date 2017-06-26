@@ -1,7 +1,0 @@
-{
-     "type": "record",
-     "name": "crucibuild/agent-example-go#header",
-     "fields": [
-       { "name": "z", "type": "string" }
-     ]
-}

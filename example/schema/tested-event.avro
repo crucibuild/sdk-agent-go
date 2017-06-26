@@ -1,7 +1,0 @@
-{
-     "type": "record",
-     "name": "crucibuild/agent-example-go#tested-event",
-     "fields": [
-       { "name": "value", "type": "string" }
-     ]
-}

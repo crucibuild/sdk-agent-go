@@ -16,9 +16,5 @@
 # JetBrains IDEs (IntelliJ, Gogland)
 .idea
 
-agent-ping
-agent-pong
-resources.go
-
 # Go generated coverage reports
 *.coverprofile
