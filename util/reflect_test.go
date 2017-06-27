@@ -16,54 +16,68 @@
 package util
 
 import (
+	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 )
 
+type aStruct struct {
+	Value string
+}
+
+func TestGetStructType(t *testing.T) {
+	// Arrange
+	var data = []struct {
+		instance     interface{}  // instance to test
+		expectedType reflect.Type // expected type
+		expectError  bool
+	}{
+		{aStruct{}, reflect.TypeOf(aStruct{}), false},
+		{&aStruct{}, reflect.TypeOf(aStruct{}), false},
+		{"foo", nil, true},
+	}
+
+	for i, tt := range data {
+		// Act
+		result, err := GetStructType(tt.instance)
+
+		// Assert
+		assert.Equal(t, tt.expectError, err != nil,
+			"test %d: Expected error and returned error must match", i)
+
+		assert.Equal(t, tt.expectedType, result,
+			"test %d: Type must match", i)
+	}
+}
+
 func TestNew(t *testing.T) {
 	// Arrange
-	type AStruct struct {
-		Value string
+	type ComplexStruct struct {
+		V1 string
+		V2 map[int]string
+		V3 []int
+		V4 chan int
+		V5 aStruct
+		V6 *aStruct
 	}
 
-	x := AStruct{}
-	tpe, err := GetStructType(x)
-
-	if err != nil {
-		t.Error(err.Error())
-	}
+	tpe := reflect.TypeOf(ComplexStruct{})
 
 	// Act
 	v := New(tpe)
 
 	// Assert
-	if v == nil {
-		t.Error("Value is nil")
-	}
+	assert.NotNil(t, v, "Value must not be nil")
 
 	// test type conversion
-	aStruct := v.(*AStruct)
-	aStruct.Value = "test"
+	aStruct := v.(*ComplexStruct)
 
-	// test field
-	ntpe, err := GetStructType(v)
-	if err != nil {
-		t.Error(err.Error())
-	}
+	// fields must be initialized
+	assert.NotNil(t, aStruct.V2, "V2 must be initialized")
 
-	if ntpe.NumField() != 1 {
-		t.Error("Incorrect number of fields")
-	}
+	assert.NotNil(t, aStruct.V3, "V3 must be initialized")
 
-	f := ntpe.Field(0)
-	if f.Name != "Value" {
-		t.Error("Incorrect field name")
-	}
+	assert.NotNil(t, aStruct.V4, "V4 must be initialized")
 
-	rv := reflect.ValueOf(v)
-
-	if rv.Kind() != reflect.Ptr || rv.IsNil() {
-		t.Error("Not applicable for non-pointer types or nil")
-	}
-
+	assert.NotNil(t, aStruct.V6, "V6 must be initialized")
 }
