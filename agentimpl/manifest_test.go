@@ -1,7 +1,8 @@
 package agentimpl
 
 import (
-	"github.com/stretchr/testify/assert"
+	"fmt"
+	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 )
 
@@ -13,20 +14,27 @@ const (
 )
 
 func TestNewManifest(t *testing.T) {
-	// Arrange
-	agentSpec := make(map[string]interface{})
+	Convey(fmt.Sprintf("Given a specification for the agent '%s'", AGENT_NAME), t, func() {
+		agentSpec := make(map[string]interface{})
 
-	agentSpec["name"] = AGENT_NAME
-	agentSpec["description"] = AGENT_DESCRIPTION
-	agentSpec["version"] = AGENT_VERSION
-	agentSpec["foo"] = AGENT_FOO
+		agentSpec["name"] = AGENT_NAME
+		agentSpec["description"] = AGENT_DESCRIPTION
+		agentSpec["version"] = AGENT_VERSION
+		agentSpec["foo"] = AGENT_FOO
 
-	// Act
-	manifest := NewManifest(agentSpec)
+		Convey("When we create a new manifest", func() {
+			manifest := NewManifest(agentSpec)
 
-	// Assert
-	assert.Equal(t, AGENT_NAME, manifest.Name(), "Name mismatch")
-	assert.Equal(t, AGENT_DESCRIPTION, manifest.Description(), "Description mismatch")
-	assert.Equal(t, AGENT_VERSION, manifest.Version(), "Version mismatch")
-	assert.ObjectsAreEqual(agentSpec, manifest.Spec())
+			Convey("The manifest should not be nil", func() {
+				So(manifest, ShouldNotBeNil)
+			})
+
+			Convey("The manifest should be equal to the specification", func() {
+				So(manifest.Name(), ShouldEqual, AGENT_NAME)
+				So(manifest.Description(), ShouldEqual, AGENT_DESCRIPTION)
+				So(manifest.Version(), ShouldEqual, AGENT_VERSION)
+				So(manifest.Spec(), ShouldEqual, agentSpec)
+			})
+		})
+	})
 }

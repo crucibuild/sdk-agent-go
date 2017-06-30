@@ -1,91 +1,151 @@
 package agentimpl
 
 import (
+	"fmt"
 	"github.com/crucibuild/sdk-agent-go/agentiface"
-	"github.com/stretchr/testify/assert"
+	. "github.com/smartystreets/goconvey/convey"
 	"reflect"
 	"testing"
 )
 
 func TestNewTypeFromInterface(t *testing.T) {
-	// Arrange
-	i := struct {
-		Value string
-	}{
-		"bar",
-	}
-	expectedName := "foo"
-	expectedType := reflect.TypeOf(i)
+	const (
+		STRUCT_NAME = "foo"
+	)
+	Convey(fmt.Sprintf("Given a struct instance named '%s'", STRUCT_NAME), t, func() {
+		i := struct {
+			Value string
+		}{
+			"bar",
+		}
+		expectedType := reflect.TypeOf(i)
 
-	// Act
-	tpe, err := NewTypeFromInterface(expectedName, i)
+		Convey(fmt.Sprintf("When when we call the NewTypeFromInterface() function"), func() {
+			tpe, err := NewTypeFromInterface(STRUCT_NAME, i)
 
-	// Assert
-	assert.Nil(t, err, "No error expected")
-	assert.NotNil(t, tpe, "Type must be not nil")
-	assert.Equal(t, expectedName, tpe.Name(), "Names must be equal")
-	assert.Equal(t, expectedType, tpe.Type(), "Types must be equal")
+			Convey("No error should occur", func() {
+				So(err, ShouldBeNil)
+			})
+
+			Convey("Type should not be nil", func() {
+				So(tpe, ShouldNotBeNil)
+			})
+
+			Convey(fmt.Sprintf("Name of the type should be equal to '%s'", STRUCT_NAME), func() {
+				So(tpe.Name(), ShouldEqual, STRUCT_NAME)
+			})
+
+			Convey(fmt.Sprintf("Type should be equal to '%s'", expectedType.Kind()), func() {
+				So(tpe.Type(), ShouldEqual, expectedType)
+			})
+		})
+	})
 }
 
 func TestNewTypeFromType(t *testing.T) {
-	// Arrange
-	expectedName := "foo"
-	expectedType := reflect.TypeOf("")
+	var (
+		TYPE_NAME = "foo"
+		TYPE      = reflect.TypeOf("")
+	)
+	Convey(fmt.Sprintf("Given a type '%s' named '%s'", TYPE.Kind(), TYPE_NAME), t, func() {
+		Convey(fmt.Sprintf("When when we call the NewTypeFromType() function"), func() {
+			tpe := NewTypeFromType(TYPE_NAME, TYPE)
 
-	// Act
-	tpe := NewTypeFromType(expectedName, expectedType)
+			Convey("Type should not be nil", func() {
+				So(tpe, ShouldNotBeNil)
+			})
 
-	// Assert
-	assert.NotNil(t, tpe, "Type must be not nil")
-	assert.Equal(t, expectedName, tpe.Name(), "Names must be equal")
-	assert.Equal(t, expectedType, tpe.Type(), "Types must be equal")
+			Convey(fmt.Sprintf("Name of the type should be equal to '%s'", TYPE_NAME), func() {
+				So(tpe.Name(), ShouldEqual, TYPE_NAME)
+			})
+
+			Convey(fmt.Sprintf("Type should be equal to '%s'", TYPE.Kind()), func() {
+				So(tpe.Type(), ShouldEqual, TYPE)
+			})
+		})
+	})
 }
 
 func TestNewTypeRegistry(t *testing.T) {
-	// Arrange
-	var agent agentiface.Agent = nil // not used
+	Convey("Given an agent", t, func() {
+		var agent agentiface.Agent = nil // not used
 
-	// Act
-	registry := NewTypeRegistry(agent)
+		Convey(fmt.Sprintf("When when we create a new type registry"), func() {
+			registry := NewTypeRegistry(agent)
 
-	// Assert
-	assert.NotNil(t, registry, "Registry instance must be not nil")
-	assert.Equal(t, 0, len(registry.TypeListNames()), "Registry must be empty")
+			Convey("The registry should no be nil", func() {
+				So(registry, ShouldNotBeNil)
+			})
+			Convey("The registry should no be empty", func() {
+				So(len(registry.TypeListNames()), ShouldEqual, 0)
+			})
+		})
+	})
 }
 
 func TestRegisterANewType(t *testing.T) {
-	// Arrange
-	var agent agentiface.Agent = nil // not used
-	expectedType := NewTypeFromType("foo", reflect.TypeOf(""))
-	registry := NewTypeRegistry(agent)
+	Convey("Given an empty registry", t, func() {
+		var agent agentiface.Agent = nil // not used
+		expectedType := NewTypeFromType("foo", reflect.TypeOf(""))
+		registry := NewTypeRegistry(agent)
 
-	// Act
-	registry.TypeRegister(expectedType)
+		Convey(fmt.Sprintf("When when we register the new type '%s'", expectedType.Name()), func() {
 
-	// Assert
-	assert.Equal(t, 1, len(registry.TypeListNames()), "Registry must contain one type")
-	assert.Equal(t, true, registry.TypeExist("foo"), "Registry must contain 'foo' type")
+			registry.TypeRegister(expectedType)
 
-	tpe, err := registry.TypeGetByName("foo")
-	assert.Nil(t, err, "Type must be retrieved by name ('foo')")
-	assert.Equal(t, expectedType, tpe, "Types must match")
+			Convey("The size of the registry should be equal to 1", func() {
+				So(len(registry.TypeListNames()), ShouldEqual, 1)
+			})
 
-	tpe, err = registry.TypeGetByType(reflect.TypeOf(""))
-	assert.Nil(t, err, "Type must be retrieved by type ('string')")
-	assert.Equal(t, expectedType, tpe, "Types must match")
+			Convey(fmt.Sprintf("The registry should contain the type '%s'", expectedType.Name()), func() {
+				So(registry.TypeExist(expectedType.Name()), ShouldBeTrue)
+			})
+
+			Convey(fmt.Sprintf("When the type '%s' is retrieved by its name in the registry", expectedType.Name()), func() {
+				tpe, err := registry.TypeGetByName("foo")
+
+				Convey("No error should occur", func() {
+					So(err, ShouldBeNil)
+				})
+				Convey(fmt.Sprintf("Type retrieved should be '%s'", expectedType.Name()), func() {
+					So(tpe, ShouldEqual, expectedType)
+				})
+			})
+
+			Convey(fmt.Sprintf("When the type '%s' is retrieved by its type in the registry", expectedType.Name()), func() {
+				tpe, err := registry.TypeGetByType(expectedType.Type())
+
+				Convey("No error should occur", func() {
+					So(err, ShouldBeNil)
+				})
+				Convey(fmt.Sprintf("Type retrieved should be '%s'", expectedType.Name()), func() {
+					So(tpe, ShouldEqual, expectedType)
+				})
+			})
+		})
+	})
 }
 
 func TestUnregisterAType(t *testing.T) {
-	// Arrange
-	var agent agentiface.Agent = nil // not used
-	expectedType := NewTypeFromType("foo", reflect.TypeOf(""))
-	registry := NewTypeRegistry(agent)
-	registry.TypeRegister(expectedType)
+	var (
+		TYPE_NAME = "foo"
+		TYPE      = reflect.TypeOf("")
+	)
+	Convey(fmt.Sprintf(`Given a registry containing only the type '%s' (%s)`, TYPE_NAME, TYPE.Kind()), t, func() {
+		var agent agentiface.Agent = nil
+		expectedType := NewTypeFromType(TYPE_NAME, TYPE)
+		registry := NewTypeRegistry(agent)
+		registry.TypeRegister(expectedType)
 
-	// Act
-	err := registry.TypeUnregister("foo")
+		Convey(fmt.Sprintf("When when we unregister the type '%s'", expectedType.Name()), func() {
+			err := registry.TypeUnregister("foo")
 
-	// Assert
-	assert.Nil(t, err, "Unregistering type must succeed")
-	assert.Equal(t, 0, len(registry.TypeListNames()), "Registry must be empty")
+			Convey("No error should occur", func() {
+				So(err, ShouldBeNil)
+			})
+			Convey("The registry should be empty", func() {
+				So(len(registry.TypeListNames()), ShouldEqual, 0)
+			})
+		})
+	})
 }
