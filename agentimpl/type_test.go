@@ -24,9 +24,9 @@ import (
 
 func TestNewTypeFromInterface(t *testing.T) {
 	const (
-		STRUCT_NAME = "foo"
+		StructName = "foo"
 	)
-	Convey(fmt.Sprintf("Given a struct instance named '%s'", STRUCT_NAME), t, func() {
+	Convey(fmt.Sprintf("Given a struct instance named '%s'", StructName), t, func() {
 		i := struct {
 			Value string
 		}{
@@ -35,7 +35,7 @@ func TestNewTypeFromInterface(t *testing.T) {
 		expectedType := reflect.TypeOf(i)
 
 		Convey(fmt.Sprintf("When when we call the NewTypeFromInterface() function"), func() {
-			tpe, err := NewTypeFromInterface(STRUCT_NAME, i)
+			tpe, err := NewTypeFromInterface(StructName, i)
 
 			Convey("No error should occur", func() {
 				So(err, ShouldBeNil)
@@ -45,8 +45,8 @@ func TestNewTypeFromInterface(t *testing.T) {
 				So(tpe, ShouldNotBeNil)
 			})
 
-			Convey(fmt.Sprintf("Name of the type should be equal to '%s'", STRUCT_NAME), func() {
-				So(tpe.Name(), ShouldEqual, STRUCT_NAME)
+			Convey(fmt.Sprintf("Name of the type should be equal to '%s'", StructName), func() {
+				So(tpe.Name(), ShouldEqual, StructName)
 			})
 
 			Convey(fmt.Sprintf("Type should be equal to '%s'", expectedType.Kind()), func() {
@@ -58,23 +58,23 @@ func TestNewTypeFromInterface(t *testing.T) {
 
 func TestNewTypeFromType(t *testing.T) {
 	var (
-		TYPE_NAME = "foo"
-		TYPE      = reflect.TypeOf("")
+		TypeName = "foo"
+		Type     = reflect.TypeOf("")
 	)
-	Convey(fmt.Sprintf("Given a type '%s' named '%s'", TYPE.Kind(), TYPE_NAME), t, func() {
+	Convey(fmt.Sprintf("Given a type '%s' named '%s'", Type.Kind(), TypeName), t, func() {
 		Convey(fmt.Sprintf("When when we call the NewTypeFromType() function"), func() {
-			tpe := NewTypeFromType(TYPE_NAME, TYPE)
+			tpe := NewTypeFromType(TypeName, Type)
 
 			Convey("Type should not be nil", func() {
 				So(tpe, ShouldNotBeNil)
 			})
 
-			Convey(fmt.Sprintf("Name of the type should be equal to '%s'", TYPE_NAME), func() {
-				So(tpe.Name(), ShouldEqual, TYPE_NAME)
+			Convey(fmt.Sprintf("Name of the type should be equal to '%s'", TypeName), func() {
+				So(tpe.Name(), ShouldEqual, TypeName)
 			})
 
-			Convey(fmt.Sprintf("Type should be equal to '%s'", TYPE.Kind()), func() {
-				So(tpe.Type(), ShouldEqual, TYPE)
+			Convey(fmt.Sprintf("Type should be equal to '%s'", Type.Kind()), func() {
+				So(tpe.Type(), ShouldEqual, Type)
 			})
 		})
 	})
@@ -142,12 +142,12 @@ func TestRegisterANewType(t *testing.T) {
 
 func TestUnregisterAType(t *testing.T) {
 	var (
-		TYPE_NAME = "foo"
-		TYPE      = reflect.TypeOf("")
+		TypeName = "foo"
+		Type     = reflect.TypeOf("")
 	)
-	Convey(fmt.Sprintf(`Given a registry containing only the type '%s' (%s)`, TYPE_NAME, TYPE.Kind()), t, func() {
-		var agent agentiface.Agent = nil
-		expectedType := NewTypeFromType(TYPE_NAME, TYPE)
+	Convey(fmt.Sprintf(`Given a registry containing only the type '%s' (%s)`, TypeName, Type.Kind()), t, func() {
+		var agent agentiface.Agent
+		expectedType := NewTypeFromType(TypeName, Type)
 		registry := NewTypeRegistry(agent)
 		registry.TypeRegister(expectedType)
 

@@ -18,17 +18,26 @@ package agentiface
 type State int
 
 const (
-	CONFIG_DEFAULT_ENDPOINT = "amqp://guest:guest@localhost:5672/"
+	// ConfigDefaultEndpoint is the default endpoint for an agent.
+	ConfigDefaultEndpoint = "amqp://guest:guest@localhost:5672/"
 
-	STATE_CONNECTED State = iota + 1
-	STATE_DISCONNECTED
+	// StateConnected represent an agent state when connected.
+	StateConnected State = iota + 1
 
-	EXCHANGE_COMMAND = "crucibuild.command"
-	EXCHANGE_EVENT   = "crucibuild.event"
+	// StateDisconnected represent an agent state when disconnected.
+	StateDisconnected
 
-	MIMETYPE_AVRO = "application/vnd.apache.avro+binary"
+	// ExchangeCommand is the name of the AMQP exchange used by the agent to send commands.j
+	ExchangeCommand = "crucibuild.command"
 
-	AMQP_HEADER_SEND_TO = "SendTo"
+	// ExchangeEvent is the name of the AMQP exchange used by the agent to send events.
+	ExchangeEvent = "crucibuild.event"
+
+	// MimeTypeAvro is the mime type used when sending AVRO schemas.
+	MimeTypeAvro = "application/vnd.apache.avro+binary"
+
+	// AmqpHeaderSendTo is the AMQP header SendTo used to force destination of a message.
+	AmqpHeaderSendTo = "SendTo"
 )
 
 // MessageName is the type representing a command name.

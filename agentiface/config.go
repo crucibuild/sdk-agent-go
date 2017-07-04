@@ -23,10 +23,10 @@ import (
 // Paths to look for the config file
 const (
 	// name of the configuration file
-	CONFIG_FILENAME = "config.properties"
+	ConfigName = "config.properties"
 	// path to look for the config file in a local (user) place
 	// %s stands for agent name
-	CONFIG_PATH_LOCAL = "$HOME/.%s"
+	ConfigPathLocal = "$HOME/.%s"
 )
 
 // Config is an wrapping basic operations to create and load a configuration file.

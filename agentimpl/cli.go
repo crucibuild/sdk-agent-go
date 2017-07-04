@@ -43,7 +43,7 @@ func NewCli(a agentiface.Agent) *Cli {
 
 				if file == "" {
 					// default configuration file
-					file = fmt.Sprintf("%s/%s", fmt.Sprintf(agentiface.CONFIG_PATH_LOCAL, a.Name()), agentiface.CONFIG_FILENAME)
+					file = fmt.Sprintf("%s/%s", fmt.Sprintf(agentiface.ConfigPathLocal, a.Name()), agentiface.ConfigName)
 				}
 
 				err := a.LoadConfigFrom(file)

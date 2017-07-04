@@ -84,7 +84,7 @@ func (ctx *Ctx) SendCommand(to string, command interface{}) error {
 		to = ctx.data.ReplyTo
 	}
 
-	publishing.Headers[agentiface.AMQP_HEADER_SEND_TO] = to
+	publishing.Headers[agentiface.AmqpHeaderSendTo] = to
 	publishing.CorrelationId = ctx.data.MessageId
 
 	return ctx.amqp.publishCommand(publishing)
@@ -98,7 +98,7 @@ func (ctx *Ctx) SendEvent(event interface{}) error {
 		return err
 	}
 
-	publishing.Headers[agentiface.AMQP_HEADER_SEND_TO] = ctx.data.ReplyTo
+	publishing.Headers[agentiface.AmqpHeaderSendTo] = ctx.data.ReplyTo
 	publishing.CorrelationId = ctx.data.MessageId
 
 	return ctx.amqp.publishEvent(publishing)
@@ -134,7 +134,7 @@ type AMQP struct {
 
 // NewAMQP creates a new instance of AMQP
 func NewAMQP(a *Agent) *AMQP {
-	a.SetDefaultConfigOption("endpoint", agentiface.CONFIG_DEFAULT_ENDPOINT)
+	a.SetDefaultConfigOption("endpoint", agentiface.ConfigDefaultEndpoint)
 
 	return &AMQP{
 		agent:              a,
@@ -157,7 +157,7 @@ func (a *AMQP) Connect() (err error) {
 
 	endpoint := a.agent.GetConfigString("endpoint")
 
-	if a.State() == agentiface.STATE_CONNECTED {
+	if a.State() == agentiface.StateConnected {
 		err = errors.New(fmt.Sprintf("Already connected to: %s", endpoint))
 		return
 	}
@@ -271,7 +271,7 @@ func (a *AMQP) Disconnect() error {
 		}
 	}()
 
-	if a.State() == agentiface.STATE_DISCONNECTED {
+	if a.State() == agentiface.StateDisconnected {
 		return errors.New("Not connected")
 	}
 
@@ -285,10 +285,10 @@ func (a *AMQP) Disconnect() error {
 // State returns the state of the connection.
 func (a *AMQP) State() agentiface.State {
 	if a.connection == nil {
-		return agentiface.STATE_DISCONNECTED
+		return agentiface.StateDisconnected
 	}
 
-	return agentiface.STATE_CONNECTED
+	return agentiface.StateConnected
 }
 
 func (a *AMQP) notifyState() {
@@ -300,13 +300,13 @@ func (a *AMQP) notifyState() {
 
 func (a *AMQP) declareExchanges() (err error) {
 	err = a.channel.ExchangeDeclare(
-		agentiface.EXCHANGE_COMMAND, // name
-		"headers",                   // type
-		true,                        // durable
-		false,                       // auto-deleted
-		false,                       // internal
-		false,                       // no-wait
-		nil,                         // arguments
+		agentiface.ExchangeCommand, // name
+		"headers",                  // type
+		true,                       // durable
+		false,                      // auto-deleted
+		false,                      // internal
+		false,                      // no-wait
+		nil,                        // arguments
 	) // args Table
 
 	if err != nil {
@@ -314,13 +314,13 @@ func (a *AMQP) declareExchanges() (err error) {
 	}
 
 	err = a.channel.ExchangeDeclare(
-		agentiface.EXCHANGE_EVENT, // name
-		"headers",                 // type
-		true,                      // durable
-		false,                     // auto-deleted
-		false,                     // internal
-		false,                     // no-wait
-		nil,                       // arguments
+		agentiface.ExchangeEvent, // name
+		"headers",                // type
+		true,                     // durable
+		false,                    // auto-deleted
+		false,                    // internal
+		false,                    // no-wait
+		nil,                      // arguments
 	) // args Table
 
 	if err != nil {
@@ -354,10 +354,10 @@ func (a *AMQP) declareQueues() (err error) {
 	err = a.channel.QueueBind(
 		a.cmdQueues[0].Name, // queue name
 		"",                  // routing key
-		agentiface.EXCHANGE_COMMAND, // exchange
+		agentiface.ExchangeCommand, // exchange
 		false,
 		amqp.Table{
-			agentiface.AMQP_HEADER_SEND_TO: a.cmdQueues[0].Name,
+			agentiface.AmqpHeaderSendTo: a.cmdQueues[0].Name,
 		},
 	)
 
@@ -368,10 +368,10 @@ func (a *AMQP) declareQueues() (err error) {
 	err = a.channel.QueueBind(
 		a.cmdQueues[0].Name, // queue name
 		"",                  // routing key
-		agentiface.EXCHANGE_COMMAND, // exchange
+		agentiface.ExchangeCommand, // exchange
 		false,
 		amqp.Table{
-			agentiface.AMQP_HEADER_SEND_TO: "*",
+			agentiface.AmqpHeaderSendTo: "*",
 		},
 	)
 
@@ -395,10 +395,10 @@ func (a *AMQP) declareQueues() (err error) {
 	err = a.channel.QueueBind(
 		a.cmdQueues[1].Name, // queue name
 		"",                  // routing key
-		agentiface.EXCHANGE_COMMAND, // exchange
+		agentiface.ExchangeCommand, // exchange
 		false,
 		amqp.Table{
-			agentiface.AMQP_HEADER_SEND_TO: a.cmdQueues[1].Name,
+			agentiface.AmqpHeaderSendTo: a.cmdQueues[1].Name,
 		},
 	)
 
@@ -422,10 +422,10 @@ func (a *AMQP) declareQueues() (err error) {
 	err = a.channel.QueueBind(
 		a.cmdQueues[2].Name, // queue name
 		"",                  // routing key
-		agentiface.EXCHANGE_COMMAND, // exchange
+		agentiface.ExchangeCommand, // exchange
 		false,
 		amqp.Table{
-			agentiface.AMQP_HEADER_SEND_TO: a.cmdQueues[2].Name,
+			agentiface.AmqpHeaderSendTo: a.cmdQueues[2].Name,
 		},
 	)
 
@@ -458,7 +458,7 @@ func (a *AMQP) declareQueues() (err error) {
 
 func (a *AMQP) getSchema(d amqp.Delivery) (agentiface.Schema, error) {
 	// check content type
-	if d.ContentType != agentiface.MIMETYPE_AVRO {
+	if d.ContentType != agentiface.MimeTypeAvro {
 		return nil, errors.New(fmt.Sprintf("Not Acceptable: Content-type: %s", d.ContentType))
 	}
 
@@ -560,7 +560,7 @@ func (a *AMQP) RegisterStateCallback(stateCallback agentiface.StateCallback) str
 
 // RegisterCommandCallback registers a callback triggered by a command reception.
 func (a *AMQP) RegisterCommandCallback(commandName agentiface.MessageName, commandCallback agentiface.CommandCallback) (string, error) {
-	if a.State() != agentiface.STATE_CONNECTED {
+	if a.State() != agentiface.StateConnected {
 		return "", errors.New(fmt.Sprintf("Cannot register command callback if not connected"))
 	}
 
@@ -571,7 +571,7 @@ func (a *AMQP) RegisterCommandCallback(commandName agentiface.MessageName, comma
 
 // RegisterEventCallback registers a callback triggered by an event reception.
 func (a *AMQP) RegisterEventCallback(filter agentiface.EventFilter, eventCallback agentiface.EventCallback) (string, error) {
-	if a.State() != agentiface.STATE_CONNECTED {
+	if a.State() != agentiface.StateConnected {
 		return "", errors.New(fmt.Sprintf("Cannot register event callback if not connected"))
 	}
 
@@ -592,7 +592,7 @@ func (a *AMQP) RegisterEventCallback(filter agentiface.EventFilter, eventCallbac
 	err = a.channel.QueueBind(
 		queue.Name, // queue name
 		"",         // routing key
-		agentiface.EXCHANGE_EVENT, // exchange
+		agentiface.ExchangeEvent, // exchange
 		false, // no-Wait
 		amqp.Table(filter),
 	)
@@ -660,7 +660,7 @@ func (a *AMQP) preparePublishing(msg interface{}) (*amqp.Publishing, error) {
 	// send command:
 	return &amqp.Publishing{
 		Timestamp:   time.Now(),
-		ContentType: agentiface.MIMETYPE_AVRO,
+		ContentType: agentiface.MimeTypeAvro,
 		MessageId:   uuid.NewV4().String(),
 		Type:        schema.Id(),
 		ReplyTo:     a.agent.Id(),
@@ -675,12 +675,12 @@ func (a *AMQP) preparePublishing(msg interface{}) (*amqp.Publishing, error) {
 }
 
 func (a *AMQP) publishCommand(publishing *amqp.Publishing) error {
-	if a.State() != agentiface.STATE_CONNECTED {
+	if a.State() != agentiface.StateConnected {
 		return errors.New("Not connected")
 	}
 
 	return a.channel.Publish(
-		agentiface.EXCHANGE_COMMAND,
+		agentiface.ExchangeCommand,
 		"",
 		false, // mandatory
 		false, // immediate
@@ -689,12 +689,12 @@ func (a *AMQP) publishCommand(publishing *amqp.Publishing) error {
 
 func (a *AMQP) publishEvent(publishing *amqp.Publishing) error {
 	a.agent.Debug("Sending event")
-	if a.State() != agentiface.STATE_CONNECTED {
+	if a.State() != agentiface.StateConnected {
 		return errors.New("Not connected")
 	}
 
 	return a.channel.Publish(
-		agentiface.EXCHANGE_EVENT,
+		agentiface.ExchangeEvent,
 		"",
 		false, // mandatory
 		false, // immediate
@@ -709,7 +709,7 @@ func (a *AMQP) SendCommand(to string, command interface{}) error {
 		return err
 	}
 
-	publishing.Headers[agentiface.AMQP_HEADER_SEND_TO] = to
+	publishing.Headers[agentiface.AmqpHeaderSendTo] = to
 
 	return a.publishCommand(publishing)
 }

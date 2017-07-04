@@ -37,8 +37,8 @@ type Config struct {
 
 // NewConfig creates a new instance of Config for an agent.
 func NewConfig(a agentiface.Agent) *Config {
-	configExtension := filepath.Ext(agentiface.CONFIG_FILENAME)
-	configBaseName := strings.TrimSuffix(agentiface.CONFIG_FILENAME, configExtension)
+	configExtension := filepath.Ext(agentiface.ConfigName)
+	configBaseName := strings.TrimSuffix(agentiface.ConfigName, configExtension)
 
 	// initialize viper (for configuration management)
 	viper := viper.New()

@@ -24,7 +24,7 @@ import (
 )
 
 // MimeTypeAvroSchema represents the mime type we use for AVRO schemas.
-const MIME_TYPE_AVRO_SCHEMA = "application/js+avro"
+const MimeTypeAvroSchema = "application/js+avro"
 
 // AvroSchema represents an AVRO schema with all its metadata.
 type AvroSchema struct {
@@ -96,7 +96,7 @@ func LoadAvroSchema(rawSchema string, registry agentiface.SchemaRegistry) (agent
 
 	for _, id := range ids {
 		schema, ok := registry.SchemaGetById(id)
-		if ok == nil && schema.MimeType() == MIME_TYPE_AVRO_SCHEMA {
+		if ok == nil && schema.MimeType() == MimeTypeAvroSchema {
 			schemas[schema.Id()] = schema.(*AvroSchema).schema
 		}
 	}
@@ -115,7 +115,7 @@ func LoadAvroSchema(rawSchema string, registry agentiface.SchemaRegistry) (agent
 	return &AvroSchema{
 		id:       avroSchema.GetName(),
 		title:    title,
-		mimetype: MIME_TYPE_AVRO_SCHEMA,
+		mimetype: MimeTypeAvroSchema,
 		raw:      avroSchema.String(),
 		schema:   avroSchema,
 	}, nil
