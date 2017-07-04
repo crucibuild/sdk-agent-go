@@ -36,7 +36,7 @@ func NewCli(a agentiface.Agent) *Cli {
 			Short: a.Description(),
 			Long:  "",
 			PersistentPreRun: func(cmd *cobra.Command, args []string) {
-				a.Info(a.Id())
+				a.Info(a.ID())
 
 				// get the flag 'config' if set (--config)
 				file, _ := cmd.Root().PersistentFlags().GetString("config")

@@ -67,6 +67,7 @@ func NewAgent(agentSpec map[string]interface{}) *Agent {
 	return agent
 }
 
-func (a *Agent) Id() string {
+// ID returns the agent id.
+func (a *Agent) ID() string {
 	return a.id
 }

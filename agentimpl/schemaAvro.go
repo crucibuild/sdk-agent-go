@@ -35,8 +35,8 @@ type AvroSchema struct {
 	schema   avro.Schema
 }
 
-// Id returns the AvroSchema id.
-func (s *AvroSchema) Id() string {
+// ID returns the AvroSchema ID.
+func (s *AvroSchema) ID() string {
 	return s.id
 }
 
@@ -95,9 +95,9 @@ func LoadAvroSchema(rawSchema string, registry agentiface.SchemaRegistry) (agent
 	schemas := make(map[string]avro.Schema)
 
 	for _, id := range ids {
-		schema, ok := registry.SchemaGetById(id)
+		schema, ok := registry.SchemaGetByID(id)
 		if ok == nil && schema.MimeType() == MimeTypeAvroSchema {
-			schemas[schema.Id()] = schema.(*AvroSchema).schema
+			schemas[schema.ID()] = schema.(*AvroSchema).schema
 		}
 	}
 
@@ -135,13 +135,13 @@ func NewSchemaRegistry(a agentiface.Agent) *SchemaRegistry {
 
 // SchemaRegister registers a schema in the registry.
 func (s *SchemaRegistry) SchemaRegister(schema agentiface.Schema) (string, error) {
-	s.schemas[schema.Id()] = schema
+	s.schemas[schema.ID()] = schema
 
-	return schema.Id(), nil
+	return schema.ID(), nil
 }
 
-// SchemaGetById returns a schema which id matches the one in parameter.
-func (s *SchemaRegistry) SchemaGetById(id string) (agentiface.Schema, error) {
+// SchemaGetByID returns a schema which id matches the one in parameter.
+func (s *SchemaRegistry) SchemaGetByID(id string) (agentiface.Schema, error) {
 	schema, ok := s.schemas[id]
 
 	if !ok {

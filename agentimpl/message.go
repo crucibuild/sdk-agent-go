@@ -191,7 +191,7 @@ func (a *AMQP) Connect() (err error) {
 
 	a.aggregationChannel = make(chan func() error)
 	a.agent.Go(func(quit <-chan struct{}) error {
-		a.agent.Info("Connected to: %s as %s", endpoint, a.agent.Id())
+		a.agent.Info("Connected to: %s as %s", endpoint, a.agent.ID())
 		defer func() {
 			close(a.aggregationChannel)
 		}()
@@ -339,7 +339,7 @@ func (a *AMQP) declareQueues() (err error) {
 	// FIXME: find a better way to code this - ugly code
 	// ## Declare queues for commands
 	a.cmdQueues[0], err = a.channel.QueueDeclare(
-		a.agent.Id(),
+		a.agent.ID(),
 		false, // durable
 		false, // delete when unused
 		true,  // exclusive
@@ -469,7 +469,7 @@ func (a *AMQP) getSchema(d amqp.Delivery) (agentiface.Schema, error) {
 		return nil, errors.New("Not Acceptable: No Message-type provided")
 	}
 
-	s, err := a.agent.SchemaGetById(messageType)
+	s, err := a.agent.SchemaGetByID(messageType)
 	if err != nil {
 		println(err.Error())
 		return nil, errors.New(fmt.Sprintf("Not Acceptable: Message-type '%s' is unknown", messageType))
@@ -487,7 +487,7 @@ func (a *AMQP) decode(d amqp.Delivery) (agentiface.Schema, interface{}, error) {
 		return nil, nil, errors.New("Not Acceptable: No Message-type provided")
 	}
 
-	s, err := a.agent.SchemaGetById(messageType)
+	s, err := a.agent.SchemaGetByID(messageType)
 	if err != nil {
 		println(err.Error())
 		return nil, nil, errors.New(fmt.Sprintf("Not Acceptable: Message-type '%s' is unknown", messageType))
@@ -515,10 +515,10 @@ func (a *AMQP) handleCommand(d amqp.Delivery) error {
 	}
 
 	// Dispatch to the suitable callback
-	c, ok := a.callbacksCmd[agentiface.MessageName(s.Id())]
+	c, ok := a.callbacksCmd[agentiface.MessageName(s.ID())]
 
 	if !ok {
-		return errors.New(fmt.Sprintf("Not Acceptable: Message-type '%s' is not handled", s.Id()))
+		return errors.New(fmt.Sprintf("Not Acceptable: Message-type '%s' is not handled", s.ID()))
 	}
 
 	// Invoke the callback
@@ -649,7 +649,7 @@ func (a *AMQP) preparePublishing(msg interface{}) (*amqp.Publishing, error) {
 	}
 
 	// from message name get the schema:
-	schema, err := a.agent.SchemaGetById(typeInfo.Name())
+	schema, err := a.agent.SchemaGetByID(typeInfo.Name())
 
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Not Acceptable: Message-type '%s' is not handled", typeInfo.Name()))
@@ -662,12 +662,12 @@ func (a *AMQP) preparePublishing(msg interface{}) (*amqp.Publishing, error) {
 		Timestamp:   time.Now(),
 		ContentType: agentiface.MimeTypeAvro,
 		MessageId:   uuid.NewV4().String(),
-		Type:        schema.Id(),
-		ReplyTo:     a.agent.Id(),
+		Type:        schema.ID(),
+		ReplyTo:     a.agent.ID(),
 
 		Headers: map[string]interface{}{
 			// used for headers routing
-			"type": schema.Id(),
+			"type": schema.ID(),
 		},
 
 		Body: bytes,

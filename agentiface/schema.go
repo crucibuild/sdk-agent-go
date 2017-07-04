@@ -17,7 +17,7 @@ package agentiface
 // Schema represent a type of message for a schema based utility like AVRO.
 type Schema interface {
 	// Id returns the Unique identifier used to reference the schema.
-	Id() string
+	ID() string
 	// Title returns the schema title.
 	Title() string
 	// MimeType returns the mimetype of the schema.
@@ -35,8 +35,8 @@ type Schema interface {
 type SchemaRegistry interface {
 	// SchemaRegister registers a new Schema in the registry.
 	SchemaRegister(schema Schema) (string, error)
-	// SchemaGetById retrieve the Schema in the registry given its id.
-	SchemaGetById(id string) (Schema, error)
+	// SchemaGetByID retrieve the Schema in the registry given its id.
+	SchemaGetByID(id string) (Schema, error)
 	// SchemaListNames list all the Schemas contained in the registry.
 	SchemaListIds() []string
 	// SchemaUnregister removes the schema from the registry.

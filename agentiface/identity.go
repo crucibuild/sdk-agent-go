@@ -17,5 +17,5 @@ package agentiface
 // Identity is a struct representing an unique identifier
 // representing an agent.
 type Identity interface {
-	Id() string
+	ID() string
 }

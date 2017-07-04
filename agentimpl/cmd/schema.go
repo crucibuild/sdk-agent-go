@@ -54,7 +54,7 @@ func cmdSchemaGet(a agentiface.Agent) *cobra.Command {
 				return errors.New("No schema identifier provided")
 			}
 
-			s, err := a.SchemaGetById(args[0])
+			s, err := a.SchemaGetByID(args[0])
 
 			if err != nil {
 				return err
