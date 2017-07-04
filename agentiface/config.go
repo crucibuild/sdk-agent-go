@@ -29,6 +29,7 @@ const (
 	CONFIG_PATH_LOCAL = "$HOME/.%s"
 )
 
+// Config is an wrapping basic operations to create and load a configuration file.
 type Config interface {
 	LoadConfig() error
 	LoadConfigFrom(path string) error

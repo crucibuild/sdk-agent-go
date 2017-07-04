@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// RegisterCmdManifest registers command line "manifest" command which enables the user to interact with the agent manifest.
 func RegisterCmdManifest(a agentiface.Agent) {
 	// Manage flags:
 

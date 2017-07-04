@@ -25,6 +25,11 @@ import (
 	"time"
 )
 
+// Ctx denotes a context when receiving a command or an event.
+// From this instance can be retrieved:
+// - the message (command or event)
+// - the schema
+// - the properties attached to the message
 type Ctx struct {
 	amqp   *AMQP
 	data   amqp.Delivery
@@ -32,14 +37,17 @@ type Ctx struct {
 	msg    interface{}
 }
 
+// Messaging returns the instance of Messaging.
 func (ctx *Ctx) Messaging() agentiface.Messaging {
 	return ctx.amqp
 }
 
+// Message returns the concrete instance of the deserialized message.
 func (ctx *Ctx) Message() interface{} {
 	return ctx.msg
 }
 
+// Properties returns the properties attached to the message.
 func (ctx *Ctx) Properties() map[string]string {
 	p := make(map[string]string)
 
@@ -59,10 +67,12 @@ func (ctx *Ctx) Properties() map[string]string {
 	return p
 }
 
+// Schema The (Avro) schema of the message serialized.
 func (ctx *Ctx) Schema() agentiface.Schema {
 	return ctx.schema
 }
 
+// SendCommand sends a command as a consequence of this event (correlationId is set)
 func (ctx *Ctx) SendCommand(to string, command interface{}) error {
 	publishing, err := ctx.amqp.preparePublishing(command)
 
@@ -80,6 +90,7 @@ func (ctx *Ctx) SendCommand(to string, command interface{}) error {
 	return ctx.amqp.publishCommand(publishing)
 }
 
+// SendEvent sends an event as a consequence of this message (correlationId is set)
 func (ctx *Ctx) SendEvent(event interface{}) error {
 	publishing, err := ctx.amqp.preparePublishing(event)
 
@@ -93,6 +104,7 @@ func (ctx *Ctx) SendEvent(event interface{}) error {
 	return ctx.amqp.publishEvent(publishing)
 }
 
+// AMQP is a low level handler of the AMQP connectionns, events and callbacks.
 type AMQP struct {
 	agent *Agent
 
@@ -103,7 +115,7 @@ type AMQP struct {
 	cmdChannels [3]<-chan amqp.Delivery
 	evtChannels []<-chan amqp.Delivery
 
-	// callbacks for state change
+	// callbacks on state changes
 	callbacksState map[string]agentiface.StateCallback
 
 	// callbacks for commands
@@ -120,6 +132,7 @@ type AMQP struct {
 	aggregationChannel chan func() error
 }
 
+// NewAMQP creates a new instance of AMQP
 func NewAMQP(a *Agent) *AMQP {
 	a.SetDefaultConfigOption("endpoint", agentiface.CONFIG_DEFAULT_ENDPOINT)
 
@@ -132,6 +145,7 @@ func NewAMQP(a *Agent) *AMQP {
 	}
 }
 
+// Connect actually connects to the AMQP broker and initializes all the exchanges and queues.
 func (a *AMQP) Connect() (err error) {
 	oldState := a.State()
 
@@ -241,6 +255,7 @@ func (a *AMQP) Connect() (err error) {
 	return
 }
 
+// Disconnect disconnect from the broker.
 func (a *AMQP) Disconnect() error {
 	oldState := a.State()
 
@@ -267,6 +282,7 @@ func (a *AMQP) Disconnect() error {
 	return err
 }
 
+// State returns the state of the connection.
 func (a *AMQP) State() agentiface.State {
 	if a.connection == nil {
 		return agentiface.STATE_DISCONNECTED
@@ -534,6 +550,7 @@ func (a *AMQP) handleEvent(d amqp.Delivery, callback agentiface.EventCallback) e
 	return err
 }
 
+// RegisterStateCallback registers a callback triggered by state changes.
 func (a *AMQP) RegisterStateCallback(stateCallback agentiface.StateCallback) string {
 	key := uuid.NewV4().String()
 	a.callbacksState[key] = stateCallback
@@ -541,6 +558,7 @@ func (a *AMQP) RegisterStateCallback(stateCallback agentiface.StateCallback) str
 	return key
 }
 
+// RegisterCommandCallback registers a callback triggered by a command reception.
 func (a *AMQP) RegisterCommandCallback(commandName agentiface.MessageName, commandCallback agentiface.CommandCallback) (string, error) {
 	if a.State() != agentiface.STATE_CONNECTED {
 		return "", errors.New(fmt.Sprintf("Cannot register command callback if not connected"))
@@ -551,6 +569,7 @@ func (a *AMQP) RegisterCommandCallback(commandName agentiface.MessageName, comma
 	return string(commandName), nil
 }
 
+// RegisterEventCallback registers a callback triggered by an event reception.
 func (a *AMQP) RegisterEventCallback(filter agentiface.EventFilter, eventCallback agentiface.EventCallback) (string, error) {
 	if a.State() != agentiface.STATE_CONNECTED {
 		return "", errors.New(fmt.Sprintf("Cannot register event callback if not connected"))
@@ -682,6 +701,7 @@ func (a *AMQP) publishEvent(publishing *amqp.Publishing) error {
 		*publishing)
 }
 
+// SendCommand sends a command to a specific agent.
 func (a *AMQP) SendCommand(to string, command interface{}) error {
 	publishing, err := a.preparePublishing(command)
 

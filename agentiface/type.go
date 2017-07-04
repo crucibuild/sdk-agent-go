@@ -16,11 +16,16 @@ package agentiface
 
 import "reflect"
 
+// Type represents a message type.
 type Type interface {
+	// Name returns the name of the type.
 	Name() string
+	// Type returns the a reflection type (reflection).
 	Type() reflect.Type
 }
 
+// TypeRegistry is a registry for types.
+// It enables us to register multiple Types and manage them with it.
 type TypeRegistry interface {
 	// TypeRegister registers a new Type in the registry.
 	TypeRegister(t Type) (string, error)

@@ -21,6 +21,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Cli implements command line argument parsing.
 type Cli struct {
 	agent   agentiface.Agent
 	rootCmd *cobra.Command
@@ -62,6 +63,7 @@ func NewCli(a agentiface.Agent) *Cli {
 	return cli
 }
 
+// ParseCommandLine parse the arguments
 func (cli *Cli) ParseCommandLine() error {
 	err := cli.rootCmd.Execute()
 
@@ -72,10 +74,12 @@ func (cli *Cli) ParseCommandLine() error {
 	return err
 }
 
+// RegisterCommand register additional commands available via the command line.
 func (cli *Cli) RegisterCommand(cmd *cobra.Command) {
 	cli.rootCmd.AddCommand(cmd)
 }
 
+// RootCommand return the rootCommand of the agent.
 func (cli *Cli) RootCommand() *cobra.Command {
 	return cli.rootCmd
 }

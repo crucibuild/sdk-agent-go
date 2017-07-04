@@ -19,6 +19,7 @@ import (
 	"reflect"
 )
 
+// InitializeStruct initialize a Go struct from reflect type and value.
 func InitializeStruct(t reflect.Type, v reflect.Value) {
 	for i := 0; i < v.NumField(); i++ {
 		f := v.Field(i)
@@ -41,6 +42,7 @@ func InitializeStruct(t reflect.Type, v reflect.Value) {
 	}
 }
 
+// GetStructType returns a struct from its reflection type.
 func GetStructType(i interface{}) (reflect.Type, error) {
 	t := reflect.TypeOf(i)
 

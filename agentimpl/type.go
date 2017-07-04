@@ -28,11 +28,13 @@ type typeStruct struct {
 	t    reflect.Type
 }
 
+// TypeRegistry is a registry referencing types.
 type TypeRegistry struct {
 	typesByName map[string]agentiface.Type
 	typesByType map[reflect.Type]agentiface.Type
 }
 
+// NewTypeRegistry returns a new instance of TypeRegistry from an agent.
 func NewTypeRegistry(a agentiface.Agent) *TypeRegistry {
 	return &TypeRegistry{
 		typesByName: make(map[string]agentiface.Type),
@@ -40,14 +42,17 @@ func NewTypeRegistry(a agentiface.Agent) *TypeRegistry {
 	}
 }
 
+// Name returns the name of a Type.
 func (t *typeStruct) Name() string {
 	return t.name
 }
 
+// Name returns a reflect Type of a Type.
 func (t *typeStruct) Type() reflect.Type {
 	return t.t
 }
 
+// NewTypeFromInterface returns a new instance of Type from a name and an interface.
 func NewTypeFromInterface(name string, i interface{}) (agentiface.Type, error) {
 	t, err := util.GetStructType(i)
 
@@ -58,6 +63,7 @@ func NewTypeFromInterface(name string, i interface{}) (agentiface.Type, error) {
 	return NewTypeFromType(name, t), nil
 }
 
+// NewTypeFromType returns a Type from a name and a Type reflection.
 func NewTypeFromType(name string, t reflect.Type) agentiface.Type {
 	return &typeStruct{
 		name: name,
@@ -65,6 +71,7 @@ func NewTypeFromType(name string, t reflect.Type) agentiface.Type {
 	}
 }
 
+// TypeRegister registers a Type into the registry.
 func (s *TypeRegistry) TypeRegister(t agentiface.Type) (string, error) {
 	s.typesByName[t.Name()] = t
 	s.typesByType[t.Type()] = t
@@ -72,6 +79,7 @@ func (s *TypeRegistry) TypeRegister(t agentiface.Type) (string, error) {
 	return t.Name(), nil
 }
 
+// TypeGetByName returns a Type which name's match key.
 func (s *TypeRegistry) TypeGetByName(key string) (agentiface.Type, error) {
 	t, ok := s.typesByName[key]
 
@@ -82,6 +90,7 @@ func (s *TypeRegistry) TypeGetByName(key string) (agentiface.Type, error) {
 	return t, nil
 }
 
+// TypeGetByType returns a Type from a reflect.Type.
 func (s *TypeRegistry) TypeGetByType(v reflect.Type) (agentiface.Type, error) {
 	t, ok := s.typesByType[v]
 
@@ -92,6 +101,7 @@ func (s *TypeRegistry) TypeGetByType(v reflect.Type) (agentiface.Type, error) {
 	return t, nil
 }
 
+// TypeListNames returns a map(<id, name>) of all the registered types.
 func (s *TypeRegistry) TypeListNames() []string {
 	values := make([]string, len(s.typesByName))
 
@@ -104,6 +114,7 @@ func (s *TypeRegistry) TypeListNames() []string {
 	return values
 }
 
+// TypeUnregister unregister the Type key from the registry.
 func (s *TypeRegistry) TypeUnregister(key string) error {
 	t, err := s.TypeGetByName(key)
 
@@ -117,6 +128,7 @@ func (s *TypeRegistry) TypeUnregister(key string) error {
 	return nil
 }
 
+// TypeExist returns true if a type matching key is known to the registry.
 func (s *TypeRegistry) TypeExist(key string) bool {
 	_, ok := s.typesByName[key]
 

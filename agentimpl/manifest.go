@@ -14,28 +14,34 @@
 
 package agentimpl
 
+// Manifest represents the core properties defining an Agent.
 type Manifest struct {
 	spec map[string]interface{}
 }
 
+// NewManifest creates a new instance of Manifest from a map.
 func NewManifest(agentSpec map[string]interface{}) *Manifest {
 	return &Manifest{
 		spec: agentSpec,
 	}
 }
 
+// Name returns the agent name.
 func (agentSpec *Manifest) Name() string {
 	return agentSpec.spec["name"].(string)
 }
 
+// Description returns the agent description.
 func (agentSpec *Manifest) Description() string {
 	return agentSpec.spec["description"].(string)
 }
 
+// Version returns the agent version.
 func (agentSpec *Manifest) Version() string {
 	return agentSpec.spec["version"].(string)
 }
 
+// Spec return the complete agent specification.
 func (agentSpec *Manifest) Spec() map[string]interface{} {
 	return agentSpec.spec
 }

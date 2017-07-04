@@ -14,6 +14,7 @@
 
 package agentiface
 
+// Manifest is the mandatory core properties of an Agent.
 type Manifest interface {
 	Name() string
 	Description() string

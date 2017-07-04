@@ -19,6 +19,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// RegisterCmdAgent register the mandatory command line commands for an agent.
 func RegisterCmdAgent(a agentiface.Agent) {
 	// Manage flags:
 

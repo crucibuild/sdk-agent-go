@@ -14,6 +14,7 @@
 
 package agentiface
 
+// State represent the current state of the agent state machine.
 type State int
 
 const (
@@ -30,31 +31,35 @@ const (
 	AMQP_HEADER_SEND_TO = "SendTo"
 )
 
+// MessageName is the type representing a command name.
 type MessageName string
 
+// EventFilter is a type representing a filter on event messages.
 type EventFilter map[string]interface{}
 
+// StateCallback is a type of callback occuring on state changes.
 type StateCallback func(state State) error
 
 // Ctx denotes a context when receiving a command or an event.
-// From this instance:
-// - the message (command or event) can be retrieved
+// From this instance can be retrieved:
+// - the message (command or event)
 // - the schema
 // - the properties attached to the message
 type Ctx interface {
-	// Messaging returns the instance of Messaging
+	// Messaging returns the instance of Messaging.
 	Messaging() Messaging
 
-	// Command returns the concrete instance of the deserialized message
+	// Command returns the concrete instance of the deserialized message.
 	Message() interface{}
 
-	// The (avro) schema of the message serialized
+	// The (Avro) schema of the message serialized.
 	Schema() Schema
 
-	// Properties returns the properties attached to the message
+	// Properties returns the properties attached to the message.
 	Properties() map[string]string
 }
 
+// EventCtx is a specialized Ctx which can trigger a command after receiving an event.
 type EventCtx interface {
 	Ctx
 
@@ -62,6 +67,7 @@ type EventCtx interface {
 	SendCommand(to string, command interface{}) error
 }
 
+// CommandCtx is a specialized Ctx which can trigger a command or an event after receiving a command.
 type CommandCtx interface {
 	Ctx
 
@@ -72,8 +78,10 @@ type CommandCtx interface {
 	SendCommand(to string, command interface{}) error
 }
 
+// CommandCallback is a type of callback occuring on command reception.
 type CommandCallback func(ctx CommandCtx) error
 
+// EventCallback is a type of callback occuring on event reception.
 type EventCallback func(ctx EventCtx) error
 
 // Messaging interface denotes the capability to send and receive messages and manage connection.

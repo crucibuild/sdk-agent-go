@@ -23,6 +23,7 @@ import (
 	"os"
 )
 
+// RegisterCmdConfig registers command line "config" command which enables the user to interact with the agent config.
 func RegisterCmdConfig(a agentiface.Agent) {
 	// Manage flags:
 	a.RootCommand().PersistentFlags().String("config", "", fmt.Sprintf("config file (default is $HOME/.%s/%s)", a.Name(), agentiface.CONFIG_FILENAME))

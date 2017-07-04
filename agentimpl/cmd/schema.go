@@ -20,6 +20,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// RegisterCmdSchema registers command line "schema" command which enables the user to interact with the agent schemas.
 func RegisterCmdSchema(a agentiface.Agent) {
 	// Manage flags:
 

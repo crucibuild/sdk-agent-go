@@ -19,10 +19,12 @@ import (
 	"github.com/go-ozzo/ozzo-log"
 )
 
+// Logger is an abstraction wrapping basic operations in order to log messages.
 type Logger struct {
 	log *log.Logger
 }
 
+// NewLogger creates a new instance of Logger associated with an agent.
 func NewLogger(a agentiface.Agent) *Logger {
 	l := log.NewLogger()
 	t1 := log.NewConsoleTarget()
@@ -39,34 +41,42 @@ func NewLogger(a agentiface.Agent) *Logger {
 	return logger
 }
 
+// Emergency prints a log with criticity Emergency.
 func (l *Logger) Emergency(format string, a ...interface{}) {
 	l.log.Emergency(format, a...)
 }
 
+// Alert prints a log with criticity Alert.
 func (l *Logger) Alert(format string, a ...interface{}) {
 	l.log.Alert(format, a...)
 }
 
+// Critical prints a log with criticity Critical.
 func (l *Logger) Critical(format string, a ...interface{}) {
 	l.log.Critical(format, a...)
 }
 
+// Error prints a log with criticity Error.
 func (l *Logger) Error(format string, a ...interface{}) {
 	l.log.Error(format, a...)
 }
 
+// Warning prints a log with criticity Warning.
 func (l *Logger) Warning(format string, a ...interface{}) {
 	l.log.Warning(format, a...)
 }
 
+// Info prints a log with criticity Info.
 func (l *Logger) Info(format string, a ...interface{}) {
 	l.log.Info(format, a...)
 }
 
+// Debug prints a log with criticity Debug.
 func (l *Logger) Debug(format string, a ...interface{}) {
 	l.log.Debug(format, a...)
 }
 
+// Close actually closes the log stream.
 func (l *Logger) Close() error {
 	l.log.Close()
 	return nil

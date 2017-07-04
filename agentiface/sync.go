@@ -14,8 +14,12 @@
 
 package agentiface
 
+// Sync is an abstraction representing the final stage of a GoRoutine pipeline.
 type Sync interface {
+	// Go
 	Go(f func(quit <-chan struct{}) error)
+	// Quit
 	Quit()
+	// Wait
 	Wait() error
 }

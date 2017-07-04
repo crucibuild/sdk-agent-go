@@ -16,6 +16,7 @@ package agentiface
 
 import "github.com/spf13/cobra"
 
+// Cli is an interface which encapsulate command line argument parsing.
 type Cli interface {
 	ParseCommandLine() error
 	RegisterCommand(cmd *cobra.Command)
