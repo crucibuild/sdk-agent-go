@@ -20,7 +20,6 @@ import (
 	"github.com/crucibuild/sdk-agent-go/agentiface"
 	"github.com/crucibuild/sdk-agent-go/util"
 	"github.com/elodina/go-avro"
-	"github.com/pkg/errors"
 )
 
 // MimeTypeAvroSchema represents the mime type we use for AVRO schemas.
@@ -145,7 +144,7 @@ func (s *SchemaRegistry) SchemaGetByID(id string) (agentiface.Schema, error) {
 	schema, ok := s.schemas[id]
 
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("No schema found in the registry with id '%s'", id))
+		return nil, fmt.Errorf(fmt.Sprintf("No schema found in the registry with id '%s'", id))
 	}
 
 	return schema, nil
@@ -167,7 +166,7 @@ func (s *SchemaRegistry) SchemaListIds() []string {
 // SchemaUnregister remove a schema from the registry.
 func (s *SchemaRegistry) SchemaUnregister(id string) error {
 	if !s.SchemaExist(id) {
-		return errors.New(fmt.Sprintf("No schema found in the registry with id '%s'", id))
+		return fmt.Errorf(fmt.Sprintf("No schema found in the registry with id '%s'", id))
 	}
 
 	delete(s.schemas, id)

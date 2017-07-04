@@ -20,7 +20,6 @@ import (
 
 	"github.com/crucibuild/sdk-agent-go/agentiface"
 	"github.com/crucibuild/sdk-agent-go/util"
-	"github.com/pkg/errors"
 )
 
 type typeStruct struct {
@@ -84,7 +83,7 @@ func (s *TypeRegistry) TypeGetByName(key string) (agentiface.Type, error) {
 	t, ok := s.typesByName[key]
 
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("No type found in the registry with key '%s'", key))
+		return nil, fmt.Errorf(fmt.Sprintf("No type found in the registry with key '%s'", key))
 	}
 
 	return t, nil
@@ -95,7 +94,7 @@ func (s *TypeRegistry) TypeGetByType(v reflect.Type) (agentiface.Type, error) {
 	t, ok := s.typesByType[v]
 
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("No type found in the registry with type '%s'", v.Name()))
+		return nil, fmt.Errorf(fmt.Sprintf("No type found in the registry with type '%s'", v.Name()))
 	}
 
 	return t, nil
