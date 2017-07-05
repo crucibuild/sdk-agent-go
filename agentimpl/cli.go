@@ -21,6 +21,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Cli implements command line argument parsing.
 type Cli struct {
 	agent   agentiface.Agent
 	rootCmd *cobra.Command
@@ -35,14 +36,14 @@ func NewCli(a agentiface.Agent) *Cli {
 			Short: a.Description(),
 			Long:  "",
 			PersistentPreRun: func(cmd *cobra.Command, args []string) {
-				a.Info(a.Id())
+				a.Info(a.ID())
 
 				// get the flag 'config' if set (--config)
 				file, _ := cmd.Root().PersistentFlags().GetString("config")
 
 				if file == "" {
 					// default configuration file
-					file = fmt.Sprintf("%s/%s", fmt.Sprintf(agentiface.CONFIG_PATH_LOCAL, a.Name()), agentiface.CONFIG_FILENAME)
+					file = fmt.Sprintf("%s/%s", fmt.Sprintf(agentiface.ConfigPathLocal, a.Name()), agentiface.ConfigName)
 				}
 
 				err := a.LoadConfigFrom(file)
@@ -62,6 +63,7 @@ func NewCli(a agentiface.Agent) *Cli {
 	return cli
 }
 
+// ParseCommandLine parse the arguments
 func (cli *Cli) ParseCommandLine() error {
 	err := cli.rootCmd.Execute()
 
@@ -72,10 +74,12 @@ func (cli *Cli) ParseCommandLine() error {
 	return err
 }
 
+// RegisterCommand register additional commands available via the command line.
 func (cli *Cli) RegisterCommand(cmd *cobra.Command) {
 	cli.rootCmd.AddCommand(cmd)
 }
 
+// RootCommand return the rootCommand of the agent.
 func (cli *Cli) RootCommand() *cobra.Command {
 	return cli.rootCmd
 }

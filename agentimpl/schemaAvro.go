@@ -20,11 +20,12 @@ import (
 	"github.com/crucibuild/sdk-agent-go/agentiface"
 	"github.com/crucibuild/sdk-agent-go/util"
 	"github.com/elodina/go-avro"
-	"github.com/pkg/errors"
 )
 
-const MIME_TYPE_AVRO_SCHEMA = "application/js+avro"
+// MimeTypeAvroSchema represents the mime type we use for AVRO schemas.
+const MimeTypeAvroSchema = "application/js+avro"
 
+// AvroSchema represents an AVRO schema with all its metadata.
 type AvroSchema struct {
 	id       string
 	title    string
@@ -33,22 +34,27 @@ type AvroSchema struct {
 	schema   avro.Schema
 }
 
-func (s *AvroSchema) Id() string {
+// ID returns the AvroSchema ID.
+func (s *AvroSchema) ID() string {
 	return s.id
 }
 
+// Title returns the AvroSchema title.
 func (s *AvroSchema) Title() string {
 	return s.title
 }
 
+// MimeType returns the AvroSchema mime type.
 func (s *AvroSchema) MimeType() string {
 	return s.mimetype
 }
 
+// Raw returns the raw AvroSchema.
 func (s *AvroSchema) Raw() string {
 	return s.raw
 }
 
+// Decode unserializes data using the AvroSchema registered.
 func (s *AvroSchema) Decode(o []byte, t agentiface.Type) (interface{}, error) {
 	// Create a new Decoder with the data
 	decoder := avro.NewBinaryDecoder(o)
@@ -66,6 +72,7 @@ func (s *AvroSchema) Decode(o []byte, t agentiface.Type) (interface{}, error) {
 	return decodedRecord, err
 }
 
+// Code serializes data using the AvroSchema registered.
 func (s *AvroSchema) Code(o interface{}) ([]byte, error) {
 	// encode command
 	writer := avro.NewSpecificDatumWriter()
@@ -78,7 +85,7 @@ func (s *AvroSchema) Code(o interface{}) ([]byte, error) {
 	return buffer.Bytes(), err
 }
 
-// loadAvroSchema loads the given raw Avro definition and returns a schema instance
+// LoadAvroSchema loads the given raw Avro definition and returns a schema instance
 // the registry is given as argument in order to resolve schemas that depends on other schema.
 func LoadAvroSchema(rawSchema string, registry agentiface.SchemaRegistry) (agentiface.Schema, error) {
 	// retrieve all schemas from the registry that are avro
@@ -87,9 +94,9 @@ func LoadAvroSchema(rawSchema string, registry agentiface.SchemaRegistry) (agent
 	schemas := make(map[string]avro.Schema)
 
 	for _, id := range ids {
-		schema, ok := registry.SchemaGetById(id)
-		if ok == nil && schema.MimeType() == MIME_TYPE_AVRO_SCHEMA {
-			schemas[schema.Id()] = schema.(*AvroSchema).schema
+		schema, ok := registry.SchemaGetByID(id)
+		if ok == nil && schema.MimeType() == MimeTypeAvroSchema {
+			schemas[schema.ID()] = schema.(*AvroSchema).schema
 		}
 	}
 
@@ -107,38 +114,43 @@ func LoadAvroSchema(rawSchema string, registry agentiface.SchemaRegistry) (agent
 	return &AvroSchema{
 		id:       avroSchema.GetName(),
 		title:    title,
-		mimetype: MIME_TYPE_AVRO_SCHEMA,
+		mimetype: MimeTypeAvroSchema,
 		raw:      avroSchema.String(),
 		schema:   avroSchema,
 	}, nil
 }
 
+// SchemaRegistry represents a registry for schemas.
 type SchemaRegistry struct {
 	schemas map[string]agentiface.Schema
 }
 
+// NewSchemaRegistry creates a new instance of SchemaRegistry.
 func NewSchemaRegistry(a agentiface.Agent) *SchemaRegistry {
 	return &SchemaRegistry{
 		schemas: make(map[string]agentiface.Schema),
 	}
 }
 
+// SchemaRegister registers a schema in the registry.
 func (s *SchemaRegistry) SchemaRegister(schema agentiface.Schema) (string, error) {
-	s.schemas[schema.Id()] = schema
+	s.schemas[schema.ID()] = schema
 
-	return schema.Id(), nil
+	return schema.ID(), nil
 }
 
-func (s *SchemaRegistry) SchemaGetById(id string) (agentiface.Schema, error) {
+// SchemaGetByID returns a schema which id matches the one in parameter.
+func (s *SchemaRegistry) SchemaGetByID(id string) (agentiface.Schema, error) {
 	schema, ok := s.schemas[id]
 
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("No schema found in the registry with id '%s'", id))
+		return nil, fmt.Errorf("No schema found in the registry with id '%s'", id)
 	}
 
 	return schema, nil
 }
 
+// SchemaListIds returns a map of <id, schema> known by the registry.
 func (s *SchemaRegistry) SchemaListIds() []string {
 	values := make([]string, len(s.schemas))
 
@@ -151,9 +163,10 @@ func (s *SchemaRegistry) SchemaListIds() []string {
 	return values
 }
 
+// SchemaUnregister remove a schema from the registry.
 func (s *SchemaRegistry) SchemaUnregister(id string) error {
 	if !s.SchemaExist(id) {
-		return errors.New(fmt.Sprintf("No schema found in the registry with id '%s'", id))
+		return fmt.Errorf("No schema found in the registry with id '%s'", id)
 	}
 
 	delete(s.schemas, id)
@@ -161,13 +174,9 @@ func (s *SchemaRegistry) SchemaUnregister(id string) error {
 	return nil
 }
 
+// SchemaExist returns true if the key match a schema known by the registry.
 func (s *SchemaRegistry) SchemaExist(key string) bool {
 	_, ok := s.schemas[key]
 
 	return ok
-}
-
-func init() {
-	// TODO: to confirm this is the correct mime-type for avro schemas
-	//mime.AddExtensionType( ".avpr","application/avro+binary"  )
 }

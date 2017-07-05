@@ -12,14 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package agentiface
+package agentimpl
 
-// Sync is an abstraction representing the final stage of a GoRoutine pipeline.
-type Sync interface {
-	// Go
-	Go(f func(quit <-chan struct{}) error)
-	// Quit
-	Quit()
-	// Wait
-	Wait() error
+import (
+	"fmt"
+	"github.com/crucibuild/sdk-agent-go/agentiface"
+	. "github.com/smartystreets/goconvey/convey"
+	"testing"
+)
+
+func TestNewConfig(t *testing.T) {
+	Convey(fmt.Sprintf("Given an empty agent and the default config path."), t, func() {
+		var agent agentiface.Agent // not used
+
+		Convey(fmt.Sprintf("When when we call the NewConfig() function"), func() {
+			config := NewConfig(agent)
+
+			Convey("Configuration instance must not be nil", func() {
+				So(config, ShouldNotBeNil)
+			})
+		})
+	})
 }

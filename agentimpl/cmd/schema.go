@@ -20,6 +20,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// RegisterCmdSchema registers command line "schema" command which enables the user to interact with the agent schemas.
 func RegisterCmdSchema(a agentiface.Agent) {
 	// Manage flags:
 
@@ -53,7 +54,7 @@ func cmdSchemaGet(a agentiface.Agent) *cobra.Command {
 				return errors.New("No schema identifier provided")
 			}
 
-			s, err := a.SchemaGetById(args[0])
+			s, err := a.SchemaGetByID(args[0])
 
 			if err != nil {
 				return err

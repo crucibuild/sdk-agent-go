@@ -24,14 +24,14 @@ import (
 
 func TestAbsPathify(t *testing.T) {
 	const (
-		ENV_VAR   = "HIDDEN_VAR"
-		ENV_VALUE = "/foo"
+		EnvVar   = "HIDDEN_VAR"
+		EnvValue = "/foo"
 	)
 	Convey(fmt.Sprintf(
 		`Given
  - the environment variable %s = %s
- - the current directory '%s'`, ENV_VAR, ENV_VALUE, mustGetwd()), t, func() {
-		os.Setenv(ENV_VAR, ENV_VALUE)
+ - the current directory '%s'`, EnvVar, EnvValue, mustGetwd()), t, func() {
+		os.Setenv(EnvVar, EnvValue)
 		wd := mustGetwd()
 
 		var data = []struct {

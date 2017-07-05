@@ -21,6 +21,7 @@ import (
 	"strings"
 )
 
+// AbsPathify takes a path, cleans it, replace env variables in it and transform it to an absolute path.
 func AbsPathify(inPath string) string {
 	if strings.HasPrefix(inPath, "$HOME") {
 		inPath = UserHomeDir() + inPath[5:]
@@ -43,7 +44,7 @@ func AbsPathify(inPath string) string {
 	return ""
 }
 
-// exists reports whether the named file or directory exists.
+// Exists reports whether the named file or directory exists.
 func Exists(name string) bool {
 	if _, err := os.Stat(name); err != nil {
 		if os.IsNotExist(err) {
@@ -53,6 +54,7 @@ func Exists(name string) bool {
 	return true
 }
 
+// UserHomeDir returns the user home directory in a crossplatform way.
 func UserHomeDir() string {
 	if runtime.GOOS == "windows" {
 		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")

@@ -23,6 +23,12 @@ import (
 	"github.com/crucibuild/sdk-agent-go/util"
 )
 
+// Agent is the implementation of the base behaviour that all Crucibuild agents should implement:
+// - config file parsing
+// - logging
+// - command line args parsing
+// - command registration
+// - etc...
 type Agent struct {
 	wait.Group
 
@@ -37,6 +43,7 @@ type Agent struct {
 	id string
 }
 
+// NewAgent creates a new Agent instance from a spec.
 func NewAgent(agentSpec map[string]interface{}) *Agent {
 	agent := &Agent{
 		id: fmt.Sprintf("%s@%s#%d", agentSpec["name"].(string), util.Host(), time.Now().UnixNano()),
@@ -60,6 +67,7 @@ func NewAgent(agentSpec map[string]interface{}) *Agent {
 	return agent
 }
 
-func (a *Agent) Id() string {
+// ID returns the agent id.
+func (a *Agent) ID() string {
 	return a.id
 }

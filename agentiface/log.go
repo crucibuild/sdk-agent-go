@@ -14,6 +14,7 @@
 
 package agentiface
 
+// Logger is an abstraction wrapping basic operations in order to log messages.
 type Logger interface {
 	// Emergency logs a message indicating the system is unusable.
 	Emergency(format string, a ...interface{})

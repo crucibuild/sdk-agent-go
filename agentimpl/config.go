@@ -29,14 +29,16 @@ import (
 	"strings"
 )
 
+// Config represents an agent configuration data.
 type Config struct {
 	agent agentiface.Agent
 	viper *viper.Viper
 }
 
+// NewConfig creates a new instance of Config for an agent.
 func NewConfig(a agentiface.Agent) *Config {
-	configExtension := filepath.Ext(agentiface.CONFIG_FILENAME)
-	configBaseName := strings.TrimSuffix(agentiface.CONFIG_FILENAME, configExtension)
+	configExtension := filepath.Ext(agentiface.ConfigName)
+	configBaseName := strings.TrimSuffix(agentiface.ConfigName, configExtension)
 
 	// initialize viper (for configuration management)
 	viper := viper.New()
@@ -49,38 +51,44 @@ func NewConfig(a agentiface.Agent) *Config {
 	}
 }
 
+// SetDefaultConfigOption sets default value for an option of the config.
 func (config *Config) SetDefaultConfigOption(key string, value interface{}) {
 	config.viper.SetDefault(key, value)
 }
 
+// BindConfigPFlag binds a command line flag with a configuration key.
 func (config *Config) BindConfigPFlag(key string, flag *pflag.Flag) error {
 	return config.viper.BindPFlag(key, flag)
 }
 
+// LoadConfig reads the configuration from the config file.
 func (config *Config) LoadConfig() error {
 	err := config.viper.ReadInConfig()
 
 	return err
 }
 
+// LoadConfigFrom reads the configuration from the config file located at path.
 func (config *Config) LoadConfigFrom(path string) error {
 	// default configuration file
 	config.viper.SetConfigFile(util.AbsPathify(path))
 	return config.LoadConfig()
 }
 
-// Init initialize a new configuration file with default values
-// returns an error if configuration file already exists
+// CreateDefaultConfig initialize a new configuration file with default values.
+// returns an error if configuration file already exists.
 func (config *Config) CreateDefaultConfig() error {
 	return config.createDefaultConfig(false)
 }
 
-// Init initialize a new configuration file with default values
-// Overwrite the file if it exists
+// CreateDefaultConfigOverwrite initialize a new configuration file with default values.
+// Overwrite the file if it exists.
 func (config *Config) CreateDefaultConfigOverwrite() error {
 	return config.createDefaultConfig(true)
 }
 
+// CreateDefaultConfig initialize a new configuration file with default values.
+// Overwrite the file if overwrite is True.
 func (config *Config) createDefaultConfig(overwrite bool) error {
 	cfgFile := config.viper.ConfigFileUsed()
 
@@ -126,6 +134,7 @@ func (config *Config) createDefaultConfig(overwrite bool) error {
 	return nil
 }
 
+// PrintConfig prints the configuration values with w.
 func (config *Config) PrintConfig(w io.Writer) error {
 	buffW := bufio.NewWriter(w)
 	for _, v := range config.viper.AllKeys() {
@@ -140,6 +149,7 @@ func (config *Config) PrintConfig(w io.Writer) error {
 	return err
 }
 
+// GetConfigString returns the value matching the key in parameter from the configuration file.
 func (config *Config) GetConfigString(key string) string {
 	return config.viper.GetString(key)
 }

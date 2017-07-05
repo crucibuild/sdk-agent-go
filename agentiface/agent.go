@@ -16,6 +16,12 @@ package agentiface
 
 import "io"
 
+// Agent is the interface of the base behaviour that all Crucibuild agents should implement:
+// - config file parsing
+// - logging
+// - command line args parsing
+// - command registration
+// - etc...
 type Agent interface {
 	Sync
 	io.Closer
