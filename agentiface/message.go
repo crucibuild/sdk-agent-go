@@ -27,7 +27,7 @@ const (
 	// StateDisconnected represent an agent state when disconnected.
 	StateDisconnected
 
-	// ExchangeCommand is the name of the AMQP exchange used by the agent to send commands.j
+	// ExchangeCommand is the name of the AMQP exchange used by the agent to send commands.
 	ExchangeCommand = "crucibuild.command"
 
 	// ExchangeEvent is the name of the AMQP exchange used by the agent to send events.
