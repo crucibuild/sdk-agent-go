@@ -189,70 +189,79 @@ func (a *AMQP) Connect() (err error) {
 		return
 	}
 
-	a.aggregationChannel = make(chan func() error)
-	a.agent.Go(func(quit <-chan struct{}) error {
-		a.agent.Info("Connected to: %s as %s", endpoint, a.agent.ID())
-		defer func() {
-			close(a.aggregationChannel)
-		}()
-		for {
-			select {
-			case d, ok := <-a.cmdChannels[0]:
-				if !ok {
-					return nil
-				}
-
-				a.aggregationChannel <- func() error {
-					return a.handleCommand(d)
-				}
-				continue
-			case d, ok := <-a.cmdChannels[1]:
-				if !ok {
-					return nil
-				}
-
-				a.aggregationChannel <- func() error {
-					return a.handleCommand(d)
-				}
-				continue
-			case d, ok := <-a.cmdChannels[2]:
-				if !ok {
-					return nil
-				}
-				a.aggregationChannel <- func() error {
-					return a.handleCommand(d)
-				}
-				continue
-			case <-quit:
-				return nil
-			}
-		}
-	})
-
-	// main loop
-	a.agent.Go(func(quit <-chan struct{}) error {
-		defer func() {
-			a.Disconnect()
-		}()
-		for {
-			select {
-			case f, ok := <-a.aggregationChannel:
-				if !ok {
-					return nil
-				}
-				err := f()
-
-				if err != nil {
-					a.agent.Error("%s", err.Error())
-				}
-
-			case <-quit:
-				return nil
-			}
-		}
-	})
+	a.agent.Go(a.readMessages)
 
 	return
+}
+
+func (a *AMQP) readMessages(quit <-chan struct{}) error {
+	endpoint := a.agent.GetConfigString("endpoint")
+	a.agent.Info("Connected to: %s as %s", endpoint, a.agent.ID())
+
+	// create an aggregation channel which gathers all incoming messages
+	a.aggregationChannel = make(chan func() error)
+
+	defer func() {
+		close(a.aggregationChannel)
+	}()
+
+	a.agent.Go(a.processMessages)
+
+	for {
+		select {
+		case d, ok := <-a.cmdChannels[0]:
+			if !ok {
+				return nil
+			}
+
+			a.aggregationChannel <- func() error {
+				return a.handleCommand(d)
+			}
+			continue
+		case d, ok := <-a.cmdChannels[1]:
+			if !ok {
+				return nil
+			}
+
+			a.aggregationChannel <- func() error {
+				return a.handleCommand(d)
+			}
+			continue
+		case d, ok := <-a.cmdChannels[2]:
+			if !ok {
+				return nil
+			}
+			a.aggregationChannel <- func() error {
+				return a.handleCommand(d)
+			}
+			continue
+		case <-quit:
+			return nil
+		}
+	}
+}
+
+func (a *AMQP) processMessages(quit <-chan struct{}) error {
+	defer func() {
+		a.Disconnect()
+	}()
+	for {
+		select {
+		case f, ok := <-a.aggregationChannel:
+			if !ok {
+				return nil
+			}
+			// call process function
+			err := f()
+
+			if err != nil {
+				a.agent.Error("%s", err.Error())
+			}
+
+		case <-quit:
+			return nil
+		}
+	}
 }
 
 // Disconnect disconnect from the broker.
