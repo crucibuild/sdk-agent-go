@@ -180,8 +180,3 @@ func (s *SchemaRegistry) SchemaExist(key string) bool {
 
 	return ok
 }
-
-func init() {
-	// TODO: to confirm this is the correct mime-type for avro schemas
-	//mime.AddExtensionType( ".avpr","application/avro+binary"  )
-}
