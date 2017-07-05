@@ -15,9 +15,11 @@
 package util
 
 import (
-	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
+
+	"fmt"
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 type aStruct struct {
@@ -25,58 +27,77 @@ type aStruct struct {
 }
 
 func TestGetStructType(t *testing.T) {
-	// Arrange
-	var data = []struct {
-		instance     interface{}  // instance to test
-		expectedType reflect.Type // expected type
-		expectError  bool
-	}{
-		{aStruct{}, reflect.TypeOf(aStruct{}), false},
-		{&aStruct{}, reflect.TypeOf(aStruct{}), false},
-		{"foo", nil, true},
-	}
+	Convey("Given a set of interfaces", t, func() {
+		var data = []struct {
+			name         string
+			instance     interface{}  // instance to test
+			expectedType reflect.Type // expected type
+			expectError  bool
+		}{
+			{"a struct", aStruct{}, reflect.TypeOf(aStruct{}), false},
+			{"a pointer to a struct", &aStruct{}, reflect.TypeOf(aStruct{}), false},
+			{"a string", "foo", nil, true},
+		}
 
-	for i, tt := range data {
-		// Act
-		result, err := GetStructType(tt.instance)
+		for _, tt := range data {
+			Convey(fmt.Sprintf("When when we get the type from %s", tt.name), func() {
+				result, err := GetStructType(tt.instance)
 
-		// Assert
-		assert.Equal(t, tt.expectError, err != nil,
-			"test %d: Expected error and returned error must match", i)
+				if tt.expectError {
+					Convey("An error should occur", func() {
+						So(err, ShouldNotBeNil)
+					})
 
-		assert.Equal(t, tt.expectedType, result,
-			"test %d: Type must match", i)
-	}
+					Convey("Value should be nil", func() {
+						So(result, ShouldBeNil)
+					})
+				} else {
+					Convey("No error should occur", func() {
+						So(err, ShouldBeNil)
+					})
+
+					Convey(fmt.Sprintf("Value should be '%s'", tt.expectedType.Name()), func() {
+						So(result, ShouldEqual, tt.expectedType)
+					})
+				}
+			})
+		}
+	})
 }
 
 func TestNew(t *testing.T) {
-	// Arrange
-	type ComplexStruct struct {
-		V1 string
-		V2 map[int]string
-		V3 []int
-		V4 chan int
-		V5 aStruct
-		V6 *aStruct
-	}
+	Convey("Given a struct", t, func() {
+		// Arrange
+		type ComplexStruct struct {
+			V1 string
+			V2 map[int]string
+			V3 []int
+			V4 chan int
+			V5 aStruct
+			V6 *aStruct
+		}
 
-	tpe := reflect.TypeOf(ComplexStruct{})
+		tpe := reflect.TypeOf(ComplexStruct{})
 
-	// Act
-	v := New(tpe)
+		Convey("When when we call the New() function", func() {
+			v := New(tpe)
 
-	// Assert
-	assert.NotNil(t, v, "Value must not be nil")
+			Convey("Created instance should not be nil", func() {
+				So(v, ShouldNotBeNil)
+			})
 
-	// test type conversion
-	aStruct := v.(*ComplexStruct)
+			Convey(fmt.Sprintf("Created instance should have the type '%s'", tpe.Name()), func() {
+				So(v, ShouldHaveSameTypeAs, &ComplexStruct{})
+			})
 
-	// fields must be initialized
-	assert.NotNil(t, aStruct.V2, "V2 must be initialized")
+			Convey("Fields of the created instance should be initialized", func() {
+				s := v.(*ComplexStruct)
 
-	assert.NotNil(t, aStruct.V3, "V3 must be initialized")
-
-	assert.NotNil(t, aStruct.V4, "V4 must be initialized")
-
-	assert.NotNil(t, aStruct.V6, "V6 must be initialized")
+				So(s.V2, ShouldNotBeNil)
+				So(s.V3, ShouldNotBeNil)
+				So(s.V4, ShouldNotBeNil)
+				So(s.V6, ShouldNotBeNil)
+			})
+		})
+	})
 }
