@@ -49,9 +49,8 @@ func cmdConfigInit(a agentiface.Agent) *cobra.Command {
 
 			if overwrite {
 				return a.CreateDefaultConfigOverwrite()
-			} else {
-				return a.CreateDefaultConfig()
 			}
+			return a.CreateDefaultConfig()
 		},
 	}
 

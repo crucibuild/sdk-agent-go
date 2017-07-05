@@ -82,7 +82,7 @@ func TestNewTypeFromType(t *testing.T) {
 
 func TestNewTypeRegistry(t *testing.T) {
 	Convey("Given an agent", t, func() {
-		var agent agentiface.Agent = nil // not used
+		var agent agentiface.Agent // not used
 
 		Convey(fmt.Sprintf("When when we create a new type registry"), func() {
 			registry := NewTypeRegistry(agent)
@@ -99,7 +99,7 @@ func TestNewTypeRegistry(t *testing.T) {
 
 func TestRegisterANewType(t *testing.T) {
 	Convey("Given an empty registry", t, func() {
-		var agent agentiface.Agent = nil // not used
+		var agent agentiface.Agent // not used
 		expectedType := NewTypeFromType("foo", reflect.TypeOf(""))
 		registry := NewTypeRegistry(agent)
 
