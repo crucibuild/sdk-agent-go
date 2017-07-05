@@ -7,6 +7,7 @@ dependencies:
 
 check: dependencies
 	! gofmt -d . 2>&1 | read
+	! golint ./... 2>&1 | read
 	go test -v -race ./...
 	go vet ./...
 
