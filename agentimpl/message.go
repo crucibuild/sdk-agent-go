@@ -158,7 +158,7 @@ func (a *AMQP) Connect() (err error) {
 	endpoint := a.agent.GetConfigString("endpoint")
 
 	if a.State() == agentiface.StateConnected {
-		err = fmt.Errorf(fmt.Sprintf("Already connected to: %s", endpoint))
+		err = fmt.Errorf("Already connected to: %s", endpoint)
 		return
 	}
 
@@ -459,7 +459,7 @@ func (a *AMQP) declareQueues() (err error) {
 func (a *AMQP) getSchema(d amqp.Delivery) (agentiface.Schema, error) {
 	// check content type
 	if d.ContentType != agentiface.MimeTypeAvro {
-		return nil, fmt.Errorf(fmt.Sprintf("Not Acceptable: Content-type: %s", d.ContentType))
+		return nil, fmt.Errorf("Not Acceptable: Content-type: %s", d.ContentType)
 	}
 
 	// check message type
@@ -472,7 +472,7 @@ func (a *AMQP) getSchema(d amqp.Delivery) (agentiface.Schema, error) {
 	s, err := a.agent.SchemaGetByID(messageType)
 	if err != nil {
 		println(err.Error())
-		return nil, fmt.Errorf(fmt.Sprintf("Not Acceptable: Message-type '%s' is unknown", messageType))
+		return nil, fmt.Errorf("Not Acceptable: Message-type '%s' is unknown", messageType)
 	}
 
 	return s, nil
@@ -490,12 +490,12 @@ func (a *AMQP) decode(d amqp.Delivery) (agentiface.Schema, interface{}, error) {
 	s, err := a.agent.SchemaGetByID(messageType)
 	if err != nil {
 		println(err.Error())
-		return nil, nil, fmt.Errorf(fmt.Sprintf("Not Acceptable: Message-type '%s' is unknown", messageType))
+		return nil, nil, fmt.Errorf("Not Acceptable: Message-type '%s' is unknown", messageType)
 	}
 
 	t, err := a.agent.TypeGetByName(messageType)
 	if err != nil {
-		return nil, nil, fmt.Errorf(fmt.Sprintf("Not Acceptable: Message-type '%s' is unknown", messageType))
+		return nil, nil, fmt.Errorf("Not Acceptable: Message-type '%s' is unknown", messageType)
 	}
 
 	decodedRecord, err := s.Decode(d.Body, t)
@@ -518,7 +518,7 @@ func (a *AMQP) handleCommand(d amqp.Delivery) error {
 	c, ok := a.callbacksCmd[agentiface.MessageName(s.ID())]
 
 	if !ok {
-		return fmt.Errorf(fmt.Sprintf("Not Acceptable: Message-type '%s' is not handled", s.ID()))
+		return fmt.Errorf("Not Acceptable: Message-type '%s' is not handled", s.ID())
 	}
 
 	// Invoke the callback
@@ -561,7 +561,7 @@ func (a *AMQP) RegisterStateCallback(stateCallback agentiface.StateCallback) str
 // RegisterCommandCallback registers a callback triggered by a command reception.
 func (a *AMQP) RegisterCommandCallback(commandName agentiface.MessageName, commandCallback agentiface.CommandCallback) (string, error) {
 	if a.State() != agentiface.StateConnected {
-		return "", fmt.Errorf(fmt.Sprintf("Cannot register command callback if not connected"))
+		return "", fmt.Errorf("Cannot register command callback if not connected")
 	}
 
 	a.callbacksCmd[commandName] = commandCallback
@@ -572,7 +572,7 @@ func (a *AMQP) RegisterCommandCallback(commandName agentiface.MessageName, comma
 // RegisterEventCallback registers a callback triggered by an event reception.
 func (a *AMQP) RegisterEventCallback(filter agentiface.EventFilter, eventCallback agentiface.EventCallback) (string, error) {
 	if a.State() != agentiface.StateConnected {
-		return "", fmt.Errorf(fmt.Sprintf("Cannot register event callback if not connected"))
+		return "", fmt.Errorf("Cannot register event callback if not connected")
 	}
 
 	// declare new queue (exclusive)
@@ -645,14 +645,14 @@ func (a *AMQP) preparePublishing(msg interface{}) (*amqp.Publishing, error) {
 	typeInfo, err := a.agent.TypeGetByType(atype)
 
 	if err != nil {
-		return nil, fmt.Errorf(fmt.Sprintf("Not Acceptable: %s", err.Error()))
+		return nil, fmt.Errorf("Not Acceptable: %s", err.Error())
 	}
 
 	// from message name get the schema:
 	schema, err := a.agent.SchemaGetByID(typeInfo.Name())
 
 	if err != nil {
-		return nil, fmt.Errorf(fmt.Sprintf("Not Acceptable: Message-type '%s' is not handled", typeInfo.Name()))
+		return nil, fmt.Errorf("Not Acceptable: Message-type '%s' is not handled", typeInfo.Name())
 	}
 
 	bytes, err := schema.Code(msg)
