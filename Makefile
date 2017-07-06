@@ -6,10 +6,7 @@ dependencies:
 	go get -t -v ./...
 
 check: dependencies
-	! gofmt -d . 2>&1 | read
-	! golint ./... 2>&1 | read
-	go test -v -race ./...
-	go vet ./...
+	"$(CURDIR)/check.sh"
 
 coverage:
 	go get golang.org/x/tools/cmd/cover
