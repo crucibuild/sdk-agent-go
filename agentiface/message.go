@@ -46,7 +46,7 @@ type MessageName string
 // EventFilter is a type representing a filter on event messages.
 type EventFilter map[string]interface{}
 
-// StateCallback is a type of callback occuring on state changes.
+// StateCallback is a type of callback occurring on state changes.
 type StateCallback func(state State) error
 
 // Ctx denotes a context when receiving a command or an event.
@@ -87,10 +87,10 @@ type CommandCtx interface {
 	SendCommand(to string, command interface{}) error
 }
 
-// CommandCallback is a type of callback occuring on command reception.
+// CommandCallback is a type of callback occurring on command reception.
 type CommandCallback func(ctx CommandCtx) error
 
-// EventCallback is a type of callback occuring on event reception.
+// EventCallback is a type of callback occurring on event reception.
 type EventCallback func(ctx EventCtx) error
 
 // Messaging interface denotes the capability to send and receive messages and manage connection.
