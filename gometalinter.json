@@ -1,23 +1,22 @@
 {
   "Enable": [
-      "structcheck",
       "aligncheck",
       "deadcode",
-      "gocyclo",
-      "ineffassign",
       "dupl",
+      "errcheck",
+      "gas",
+      "goconst",
+      "gocyclo",
+      "goimports",
       "golint",
       "gotype",
-      "goimports",
-      "errcheck",
-      "varcheck",
+      "ineffassign",
       "interfacer",
-      "goconst",
-      "gosimple",
-      "staticcheck",
-      "unparam",
-      "unused",
+      "megacheck",
       "misspell",
-      "gas",
-      "safesql"]
+      "safesql",
+      "structcheck",
+      "unparam",
+      "varcheck"
+  ]
 }
