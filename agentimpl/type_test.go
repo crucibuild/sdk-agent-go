@@ -105,7 +105,15 @@ func TestRegisterANewType(t *testing.T) {
 
 		Convey(fmt.Sprintf("When when we register the new type '%s'", expectedType.Name()), func() {
 
-			registry.TypeRegister(expectedType)
+			value, err := registry.TypeRegister(expectedType)
+
+			Convey("No error should occur", func() {
+				So(err, ShouldBeNil)
+			})
+
+			Convey(fmt.Sprintf("The value returned should be %s", expectedType.Name()), func() {
+				So(value, ShouldEqual, expectedType.Name())
+			})
 
 			Convey("The size of the registry should be equal to 1", func() {
 				So(len(registry.TypeListNames()), ShouldEqual, 1)
@@ -149,7 +157,9 @@ func TestUnregisterAType(t *testing.T) {
 		var agent agentiface.Agent
 		expectedType := NewTypeFromType(TypeName, Type)
 		registry := NewTypeRegistry(agent)
-		registry.TypeRegister(expectedType)
+		_, err := registry.TypeRegister(expectedType)
+
+		So(err, ShouldBeNil)
 
 		Convey(fmt.Sprintf("When when we unregister the type '%s'", expectedType.Name()), func() {
 			err := registry.TypeUnregister("foo")

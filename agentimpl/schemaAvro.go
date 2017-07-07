@@ -126,6 +126,7 @@ type SchemaRegistry struct {
 }
 
 // NewSchemaRegistry creates a new instance of SchemaRegistry.
+// nolint: unparam, parameter a is reserved for a future usage
 func NewSchemaRegistry(a agentiface.Agent) *SchemaRegistry {
 	return &SchemaRegistry{
 		schemas: make(map[string]agentiface.Schema),

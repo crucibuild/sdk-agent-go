@@ -31,7 +31,8 @@ func TestAbsPathify(t *testing.T) {
 		`Given
  - the environment variable %s = %s
  - the current directory '%s'`, EnvVar, EnvValue, mustGetwd()), t, func() {
-		os.Setenv(EnvVar, EnvValue)
+		err := os.Setenv(EnvVar, EnvValue)
+		So(err, ShouldBeNil)
 		wd := mustGetwd()
 
 		var data = []struct {

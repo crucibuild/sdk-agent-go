@@ -44,13 +44,15 @@ type Agent struct {
 }
 
 // NewAgent creates a new Agent instance from a spec.
-func NewAgent(agentSpec map[string]interface{}) *Agent {
-	agent := &Agent{
+func NewAgent(agentSpec map[string]interface{}) (agent *Agent, err error) {
+	agent = &Agent{
 		id: fmt.Sprintf("%s@%s#%d", agentSpec["name"].(string), util.Host(), time.Now().UnixNano()),
 	}
 
 	agent.Manifest = NewManifest(agentSpec)
-	agent.Logger = NewLogger(agent)
+	if agent.Logger, err = NewLogger(agent); err != nil {
+		return
+	}
 	agent.Cli = NewCli(agent)
 
 	agent.Config = NewConfig(agent)
@@ -64,7 +66,7 @@ func NewAgent(agentSpec map[string]interface{}) *Agent {
 	cmd.RegisterCmdManifest(agent)
 	cmd.RegisterCmdSchema(agent)
 
-	return agent
+	return
 }
 
 // ID returns the agent id.

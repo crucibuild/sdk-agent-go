@@ -33,19 +33,12 @@ func cmdAgentStart(a agentiface.Agent) *cobra.Command {
 		Short: "Start the agent",
 		Long:  `Start the agent.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			err := a.Connect()
-
-			if err != nil {
-				return err
-			}
-
-			return nil
+			return a.Connect()
 		},
 	}
 
 	command.Flags().String("endpoint", "", "endpoint")
-	a.BindConfigPFlag("endpoint", command.Flags().Lookup("endpoint"))
+	a.BindConfigPFlag("endpoint", command.Flags().Lookup("endpoint")) // nolint: errcheck, no error can occur here, by construction.
 
 	return command
 }

@@ -38,7 +38,7 @@ func cmdManifestVersion(a agentiface.Agent) *cobra.Command {
 		Short: "Provide the version of the agent",
 		Long:  `Provide the version of the agent.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(fmt.Sprintf("%s", a.Version()))
+			fmt.Println(a.Version())
 		},
 	}
 
@@ -51,7 +51,7 @@ func cmdManifestName(a agentiface.Agent) *cobra.Command {
 		Short: "Provide the name of the agent",
 		Long:  `Provide the name of the agent.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(fmt.Sprintf("%s", a.Name()))
+			fmt.Println(a.Name())
 		},
 	}
 

@@ -34,6 +34,7 @@ type TypeRegistry struct {
 }
 
 // NewTypeRegistry returns a new instance of TypeRegistry from an agent.
+// nolint: unparam, parameter a is reserved for a future usage
 func NewTypeRegistry(a agentiface.Agent) *TypeRegistry {
 	return &TypeRegistry{
 		typesByName: make(map[string]agentiface.Type),
