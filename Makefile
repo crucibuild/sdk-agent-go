@@ -6,7 +6,9 @@ dependencies:
 	go get -t -v ./...
 
 check: dependencies
-	"$(CURDIR)/check.sh"
+	go get -u github.com/alecthomas/gometalinter
+	gometalinter --install --update
+	gometalinter --config "$(CURDIR)/gometalinter.json" ./...
 
 coverage:
 	go get golang.org/x/tools/cmd/cover
