@@ -113,7 +113,6 @@ type AMQP struct {
 	channel     *amqp.Channel
 	cmdQueues   [3]amqp.Queue
 	cmdChannels [3]<-chan amqp.Delivery
-	evtChannels []<-chan amqp.Delivery
 
 	// callbacks on state changes
 	callbacksState map[string]agentiface.StateCallback
@@ -166,26 +165,26 @@ func (a *AMQP) Connect() (err error) {
 
 	a.connection, err = amqp.Dial(endpoint)
 	if err != nil {
-		a.Disconnect()
+		a.Disconnect() // nolint: errcheck, silently disconnect and do not report any errors
 		return
 	}
 
 	a.channel, err = a.connection.Channel()
 
 	if err != nil {
-		a.Disconnect()
+		a.Disconnect() // nolint: errcheck, silently disconnect and do not report any errors
 		return
 	}
 
 	err = a.declareExchanges()
 	if err != nil {
-		a.Disconnect()
+		a.Disconnect() // nolint: errcheck, silently disconnect and do not report any errors
 		return
 	}
 
 	err = a.declareQueues()
 	if err != nil {
-		a.Disconnect()
+		a.Disconnect() // nolint: errcheck, silently disconnect and do not report any errors
 		return
 	}
 
@@ -243,7 +242,10 @@ func (a *AMQP) readMessages(quit <-chan struct{}) error {
 
 func (a *AMQP) processMessages(quit <-chan struct{}) error {
 	defer func() {
-		a.Disconnect()
+		err := a.Disconnect()
+		if err != nil {
+			a.agent.Warning("%s", err.Error())
+		}
 	}()
 	for {
 		select {
@@ -303,7 +305,7 @@ func (a *AMQP) State() agentiface.State {
 func (a *AMQP) notifyState() {
 	s := a.State()
 	for _, f := range a.callbacksState {
-		f(s)
+		f(s) // nolint: errcheck, error returned by callback function is not currently used in the sdk
 	}
 }
 
@@ -332,11 +334,7 @@ func (a *AMQP) declareExchanges() (err error) {
 		nil,                      // arguments
 	) // args Table
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // declareQueues perform the declaration and binding of common queues for the agent.
@@ -492,14 +490,9 @@ func (a *AMQP) getSchema(d amqp.Delivery) (agentiface.Schema, error) {
 func (a *AMQP) decode(d amqp.Delivery) (agentiface.Schema, interface{}, error) {
 	messageType := strings.TrimSpace(d.Type)
 
-	if messageType == "" {
-		return nil, nil, errors.New("Not Acceptable: No Message-type provided")
-	}
-
-	s, err := a.agent.SchemaGetByID(messageType)
+	s, err := a.getSchema(d)
 	if err != nil {
-		println(err.Error())
-		return nil, nil, fmt.Errorf("Not Acceptable: Message-type '%s' is unknown", messageType)
+		return nil, nil, err
 	}
 
 	t, err := a.agent.TypeGetByName(messageType)
@@ -665,6 +658,10 @@ func (a *AMQP) preparePublishing(msg interface{}) (*amqp.Publishing, error) {
 	}
 
 	bytes, err := schema.Code(msg)
+
+	if err != nil {
+		return nil, err
+	}
 
 	// send command:
 	return &amqp.Publishing{

@@ -106,7 +106,12 @@ func (config *Config) createDefaultConfig(overwrite bool) error {
 
 	p := properties.NewProperties()
 	for _, v := range config.viper.AllKeys() {
-		p.Set(v, config.viper.GetString(v))
+		_, _, err := p.Set(v, config.viper.GetString(v))
+
+		if err != nil {
+			return err
+		}
+
 	}
 
 	err := os.MkdirAll(filepath.Dir(cfgFile), os.ModePerm)
@@ -121,7 +126,7 @@ func (config *Config) createDefaultConfig(overwrite bool) error {
 		return err
 	}
 
-	defer f.Close()
+	defer f.Close() // nolint: errcheck, silently close the file and do not report any errors
 
 	_, err = p.Write(f, properties.UTF8)
 

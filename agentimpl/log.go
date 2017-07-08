@@ -25,20 +25,25 @@ type Logger struct {
 }
 
 // NewLogger creates a new instance of Logger associated with an agent.
-func NewLogger(a agentiface.Agent) *Logger {
+func NewLogger(a agentiface.Agent) (*Logger, error) {
 	l := log.NewLogger()
 	t1 := log.NewConsoleTarget()
 	l.Targets = append(l.Targets, t1)
 	l.CallStackDepth = 0
 
 	l.Category = a.Name()
-	l.Open()
+
+	err := l.Open()
+
+	if err != nil {
+		return nil, err
+	}
 
 	logger := &Logger{
 		log: l,
 	}
 
-	return logger
+	return logger, nil
 }
 
 // Emergency prints a log with criticity Emergency.

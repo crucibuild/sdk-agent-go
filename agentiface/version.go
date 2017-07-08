@@ -14,4 +14,4 @@
 
 package agentiface
 
-const version = "0.0.1"
+const version = "0.0.1" // nolint: deadcode, varcheck, megacheck, as a library, this constant may be used by third parties.

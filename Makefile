@@ -6,10 +6,9 @@ dependencies:
 	go get -t -v ./...
 
 check: dependencies
-	! gofmt -d . 2>&1 | read
-	! golint ./... 2>&1 | read
-	go test -v -race ./...
-	go vet ./...
+	go get -u github.com/alecthomas/gometalinter
+	gometalinter --install --update
+	gometalinter -j2 --config "$(CURDIR)/gometalinter.json" ./...
 
 coverage:
 	go get golang.org/x/tools/cmd/cover
