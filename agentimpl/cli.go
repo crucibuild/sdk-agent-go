@@ -32,8 +32,8 @@ func NewCli(a agentiface.Agent) *Cli {
 	cli := &Cli{
 		agent: a,
 		rootCmd: &cobra.Command{
-			Use:   a.Name(),
-			Short: a.Description(),
+			Use:   a.Manifest().Name(),
+			Short: a.Manifest().Description(),
 			Long:  "",
 			PersistentPreRun: func(cmd *cobra.Command, args []string) {
 				a.Info(a.ID())
@@ -43,7 +43,7 @@ func NewCli(a agentiface.Agent) *Cli {
 
 				if file == "" {
 					// default configuration file
-					file = fmt.Sprintf("%s/%s", fmt.Sprintf(agentiface.ConfigPathLocal, a.Name()), agentiface.ConfigName)
+					file = fmt.Sprintf("%s/%s", fmt.Sprintf(agentiface.ConfigPathLocal, a.Manifest().Name()), agentiface.ConfigName)
 				}
 
 				err := a.LoadConfigFrom(file)

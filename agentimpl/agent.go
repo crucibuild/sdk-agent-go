@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/cespare/wait"
+	"github.com/crucibuild/sdk-agent-go/agentiface"
 	"github.com/crucibuild/sdk-agent-go/agentimpl/cmd"
 	"github.com/crucibuild/sdk-agent-go/util"
 )
@@ -37,24 +38,23 @@ type Agent struct {
 	*SchemaRegistry
 	*TypeRegistry
 	*AMQP
-	*Manifest
 	*Logger
 
-	id string
+	id       string
+	manifest agentiface.Manifest
 }
 
 // NewAgent creates a new Agent instance from a spec.
-func NewAgent(agentSpec map[string]interface{}) (agent *Agent, err error) {
+func NewAgent(manifest agentiface.Manifest) (agent *Agent, err error) {
 	agent = &Agent{
-		id: fmt.Sprintf("%s@%s#%d", agentSpec["name"].(string), util.Host(), time.Now().UnixNano()),
+		id: fmt.Sprintf("%s@%s#%d", manifest.Name(), util.Host(), time.Now().UnixNano()),
 	}
 
-	agent.Manifest = NewManifest(agentSpec)
+	agent.manifest = manifest
 	if agent.Logger, err = NewLogger(agent); err != nil {
 		return
 	}
 	agent.Cli = NewCli(agent)
-
 	agent.Config = NewConfig(agent)
 	agent.SchemaRegistry = NewSchemaRegistry(agent)
 	agent.TypeRegistry = NewTypeRegistry(agent)
@@ -72,4 +72,9 @@ func NewAgent(agentSpec map[string]interface{}) (agent *Agent, err error) {
 // ID returns the agent id.
 func (a *Agent) ID() string {
 	return a.id
+}
+
+// Manifest returns the manifest of the agent.
+func (a *Agent) Manifest() agentiface.Manifest {
+	return a.manifest
 }

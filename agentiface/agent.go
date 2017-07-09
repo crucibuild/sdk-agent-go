@@ -29,10 +29,11 @@ type Agent interface {
 	Identity
 
 	Logger
-	Manifest
 	Messaging
 	Cli
 	Config
 	SchemaRegistry
 	TypeRegistry
+
+	Manifest() Manifest
 }
