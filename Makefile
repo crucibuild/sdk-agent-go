@@ -8,7 +8,7 @@ dependencies:
 check: dependencies
 	go get -u github.com/alecthomas/gometalinter
 	gometalinter --install --update
-	gometalinter -j2 --config "$(CURDIR)/gometalinter.json" ./...
+	gometalinter -j2 --deadline 60s --config "$(CURDIR)/gometalinter.json" ./...
 
 coverage:
 	go get golang.org/x/tools/cmd/cover
