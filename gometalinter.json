@@ -12,7 +12,6 @@
         "interfacer",
         "megacheck",
         "misspell",
-        "safesql",
         "structcheck",
         "unparam",
         "varcheck"
@@ -20,6 +19,7 @@
     "Unused": [
         "lll",
         "dupl",
-        "goimports"
+        "goimports",
+        "safesql"
     ]
 }

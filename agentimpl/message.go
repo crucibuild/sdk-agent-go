@@ -387,7 +387,7 @@ func (a *AMQP) declareQueues() (err error) {
 	}
 
 	a.cmdQueues[1], err = a.channel.QueueDeclare(
-		fmt.Sprintf("%s@%s", a.agent.Name(), util.Host()),
+		fmt.Sprintf("%s@%s", a.agent.Manifest().Name(), util.Host()),
 		false, // durable
 		false, // delete when unused
 		false, // exclusive
@@ -414,7 +414,7 @@ func (a *AMQP) declareQueues() (err error) {
 	}
 
 	a.cmdQueues[2], err = a.channel.QueueDeclare(
-		a.agent.Name(),
+		a.agent.Manifest().Name(),
 		false, // durable
 		false, // delete when unused
 		false, // exclusive

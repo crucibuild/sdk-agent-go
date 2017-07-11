@@ -31,7 +31,7 @@ func NewLogger(a agentiface.Agent) (*Logger, error) {
 	l.Targets = append(l.Targets, t1)
 	l.CallStackDepth = 0
 
-	l.Category = a.Name()
+	l.Category = a.Manifest().Name()
 
 	err := l.Open()
 
