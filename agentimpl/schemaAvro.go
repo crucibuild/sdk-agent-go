@@ -16,7 +16,6 @@ package agentimpl
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/crucibuild/sdk-agent-go/agentiface"
 	"github.com/crucibuild/sdk-agent-go/util"
 	"github.com/elodina/go-avro"
@@ -27,11 +26,10 @@ const MimeTypeAvroSchema = "application/js+avro"
 
 // AvroSchema represents an AVRO schema with all its metadata.
 type AvroSchema struct {
-	id       string
-	title    string
-	mimetype string
-	raw      string
-	schema   avro.Schema
+	id     string
+	title  string
+	raw    string
+	schema avro.Schema
 }
 
 // ID returns the AvroSchema ID.
@@ -45,8 +43,8 @@ func (s *AvroSchema) Title() string {
 }
 
 // MimeType returns the AvroSchema mime type.
-func (s *AvroSchema) MimeType() string {
-	return s.mimetype
+func (*AvroSchema) MimeType() string {
+	return MimeTypeAvroSchema
 }
 
 // Raw returns the raw AvroSchema.
@@ -89,7 +87,7 @@ func (s *AvroSchema) Code(o interface{}) ([]byte, error) {
 // the registry is given as argument in order to resolve schemas that depends on other schema.
 func LoadAvroSchema(rawSchema string, registry agentiface.SchemaRegistry) (agentiface.Schema, error) {
 	// retrieve all schemas from the registry that are avro
-	// this is not efficient, but I can't probably can't do more
+	// this is not efficient, but I can't probably do more
 	ids := registry.SchemaListIds()
 	schemas := make(map[string]avro.Schema)
 
@@ -112,72 +110,9 @@ func LoadAvroSchema(rawSchema string, registry agentiface.SchemaRegistry) (agent
 	}
 
 	return &AvroSchema{
-		id:       avroSchema.GetName(),
-		title:    title,
-		mimetype: MimeTypeAvroSchema,
-		raw:      avroSchema.String(),
-		schema:   avroSchema,
+		id:     avroSchema.GetName(),
+		title:  title,
+		raw:    avroSchema.String(),
+		schema: avroSchema,
 	}, nil
-}
-
-// SchemaRegistry represents a registry for schemas.
-type SchemaRegistry struct {
-	schemas map[string]agentiface.Schema
-}
-
-// NewSchemaRegistry creates a new instance of SchemaRegistry.
-// nolint: unparam, parameter a is reserved for a future usage
-func NewSchemaRegistry(a agentiface.Agent) *SchemaRegistry {
-	return &SchemaRegistry{
-		schemas: make(map[string]agentiface.Schema),
-	}
-}
-
-// SchemaRegister registers a schema in the registry.
-func (s *SchemaRegistry) SchemaRegister(schema agentiface.Schema) (string, error) {
-	s.schemas[schema.ID()] = schema
-
-	return schema.ID(), nil
-}
-
-// SchemaGetByID returns a schema which id matches the one in parameter.
-func (s *SchemaRegistry) SchemaGetByID(id string) (agentiface.Schema, error) {
-	schema, ok := s.schemas[id]
-
-	if !ok {
-		return nil, fmt.Errorf("No schema found in the registry with id '%s'", id)
-	}
-
-	return schema, nil
-}
-
-// SchemaListIds returns a map of <id, schema> known by the registry.
-func (s *SchemaRegistry) SchemaListIds() []string {
-	values := make([]string, len(s.schemas))
-
-	i := 0
-	for k := range s.schemas {
-		values[i] = k
-		i++
-	}
-
-	return values
-}
-
-// SchemaUnregister remove a schema from the registry.
-func (s *SchemaRegistry) SchemaUnregister(id string) error {
-	if !s.SchemaExist(id) {
-		return fmt.Errorf("No schema found in the registry with id '%s'", id)
-	}
-
-	delete(s.schemas, id)
-
-	return nil
-}
-
-// SchemaExist returns true if the key match a schema known by the registry.
-func (s *SchemaRegistry) SchemaExist(key string) bool {
-	_, ok := s.schemas[key]
-
-	return ok
 }
