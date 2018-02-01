@@ -554,7 +554,7 @@ func (a *AMQP) handleEvent(d amqp.Delivery, callback agentiface.EventCallback) e
 
 // RegisterStateCallback registers a callback triggered by state changes.
 func (a *AMQP) RegisterStateCallback(stateCallback agentiface.StateCallback) string {
-	key := uuid.NewV4().String()
+	key := uuid.Must(uuid.NewV4()).String()
 	a.callbacksState[key] = stateCallback
 
 	return key
@@ -667,7 +667,7 @@ func (a *AMQP) preparePublishing(msg interface{}) (*amqp.Publishing, error) {
 	return &amqp.Publishing{
 		Timestamp:   time.Now(),
 		ContentType: agentiface.MimeTypeAvro,
-		MessageId:   uuid.NewV4().String(),
+		MessageId:   uuid.Must(uuid.NewV4()).String(),
 		Type:        schema.ID(),
 		ReplyTo:     a.agent.ID(),
 
