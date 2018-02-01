@@ -2,13 +2,14 @@ default: check
 
 .PHONY: check ci dependencies
 
+SCRIPTS_PATH:=$(CURDIR)/../scripts-build-go/script
+
 dependencies:
-	go get -t -v ./...
+	go get -v -d -u "github.com/crucibuild/scripts-build-go"
+	go get -v -d ./...
 
 check: dependencies
-	go get -u github.com/alecthomas/gometalinter
-	gometalinter --install --update
-	gometalinter -j2 --deadline 60s --config "$(CURDIR)/gometalinter.json" ./...
+	$(SCRIPTS_PATH)/check.sh
 
 coverage:
 	go get golang.org/x/tools/cmd/cover
