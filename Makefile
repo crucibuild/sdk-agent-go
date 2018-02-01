@@ -6,7 +6,7 @@ SCRIPTS_PATH:=$(CURDIR)/../scripts-build-go/script
 
 dependencies:
 	go get -v -d -u "github.com/crucibuild/scripts-build-go"
-	go get -v -d ./...
+	go get -v -d -t ./...
 
 check: dependencies
 	$(SCRIPTS_PATH)/check.sh
