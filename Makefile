@@ -1,21 +1,27 @@
-default: check
-
-.PHONY: check ci dependencies
+default: all
 
 SCRIPTS_PATH:=$(CURDIR)/../scripts-build-go/script
+
+.PHONY: all check dependencies
 
 dependencies:
 	go get -v -d -u "github.com/crucibuild/scripts-build-go"
 	go get -v -d -t ./...
 
-check: dependencies
+build: dependencies
+	go build ./...
+
+test: build
+	go test ./...
+
+check:
 	$(SCRIPTS_PATH)/check.sh
 
 coverage:
-	go get golang.org/x/tools/cmd/cover
-	go get github.com/go-playground/overalls
-	"${GOPATH}/bin/overalls" -project=github.com/crucibuild/sdk-agent-go
+	$(SCRIPTS_PATH)/gen_coverage.sh
 
-ci: check coverage
-	go get github.com/mattn/goveralls
-	"${GOPATH}/bin/goveralls" -coverprofile=overalls.coverprofile -service=travis-ci
+all: test check coverage
+	$(SCRIPTS_PATH)/push_coverage.sh
+
+ci: all
+	true
